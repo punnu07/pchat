@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">pChat</string>
+    <string name="hyperlink">Not a Member?<a href="">Sign Up</a></string>
+</resources>
