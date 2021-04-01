@@ -21,6 +21,7 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
@@ -105,7 +106,7 @@ public class CreateGroup extends AppCompatActivity {
             }
 
             //after group creation go back to the profile
-            Intent intent = new Intent(context, Profile.class);
+            Intent intent = new Intent(context, MyGroups.class);
             intent.putExtra(EXTRA_PWD, pword);
             intent.putExtra(EXTRA_NAME, uname);
             startActivity(intent);
@@ -191,8 +192,16 @@ public class CreateGroup extends AppCompatActivity {
                     submitForm.setAnswer("muc#roomconfig_persistentroom", true);
                     muc.sendConfigurationForm(submitForm);
 
+
+                    //create roster
+                    Roster roster = Roster.getInstanceFor(connection);
+                    roster.setSubscriptionMode(Roster.SubscriptionMode.accept_all);
+                    String jid = roomname + "@conference.pchat";
+                    roster.createEntry(roomname, jid, null);
+
                 } catch (SmackException.NoResponseException e) {
                     e.printStackTrace();
+
                     Log.d("xmpp: ", "Chat room join Error: " + e.getMessage());
                 } catch (XMPPException.XMPPErrorException e) {
                     e.printStackTrace();

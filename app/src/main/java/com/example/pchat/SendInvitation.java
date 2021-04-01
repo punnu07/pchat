@@ -36,7 +36,7 @@ public class SendInvitation extends AppCompatActivity {
 
     public static final String EXTRA_NAME = "a";
     public static final String EXTRA_PWD = "b";
-    public static final String EXTRA_MSG = "c";
+    public static final String EXTRA_ROOM = "c";
 
 
 
@@ -45,6 +45,7 @@ public class SendInvitation extends AppCompatActivity {
 
     public String uname = "";
     public String pword = "";
+    public String roomname="";
 
     AbstractXMPPConnection connection;
 
@@ -57,6 +58,7 @@ public class SendInvitation extends AppCompatActivity {
 
         uname=getIntent().getStringExtra(SendInvitation.EXTRA_NAME);
         pword=getIntent().getStringExtra(SendInvitation.EXTRA_PWD);
+        roomname=getIntent().getStringExtra(SendInvitation.EXTRA_ROOM);
 
 
         Button sendinvite_button= findViewById(R.id.sendinvitebutton);
@@ -70,6 +72,31 @@ public class SendInvitation extends AppCompatActivity {
         });
 
     }//end of oncreate
+
+
+/*
+
+    protected void onDestroy(){
+        super.onDestroy();
+
+
+
+
+
+//        Intent intent = new Intent(context, MyChatroom.class);
+  //      startActivity(intent);
+
+
+
+
+
+        finish();
+    }//end of onDestroy
+
+
+*/
+
+
 
 
 
@@ -98,8 +125,18 @@ public class SendInvitation extends AppCompatActivity {
                 dialog.dismiss();
             }
 
-            //after group creation go back to the profile
-            Intent intent = new Intent(context, Profile.class);
+
+
+            String fullroomname=roomname+"@conference.pchat";
+
+            //after user creation go back to the profile
+            Intent intent = new Intent(context, MyChatroom.class);
+
+            intent.putExtra(EXTRA_PWD, pword);
+            intent.putExtra(EXTRA_NAME, uname);
+
+            intent.putExtra(EXTRA_ROOM,fullroomname);
+
             startActivity(intent);
 
 
@@ -147,8 +184,8 @@ public class SendInvitation extends AppCompatActivity {
             {
 
                 EditText et;
-                et=findViewById(R.id.sendinvitationgroupname);
-                String groupname=et.getText().toString();
+                //et=findViewById(R.id.sendinvitationgroupname);
+                String groupname=roomname;
 
                 et=findViewById(R.id.sendinvitationusername);
                 String username=et.getText().toString();
@@ -209,8 +246,6 @@ public class SendInvitation extends AppCompatActivity {
 
 
 
-                //disconnect the connection
-            connection.disconnect();
 
 
             return null;

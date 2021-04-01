@@ -10,33 +10,104 @@
         android:id="@+id/creategroupdisplay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="64dp"
+        android:layout_marginBottom="8dp"
         android:text="Create Group"
+        app:layout_constraintBottom_toTopOf="@+id/uppercard"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.509"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/GroupName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        android:ems="10"
-        android:hint="Group name"
-        android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/creategroupdisplay" />
-
-    <Button
-        android:id="@+id/creategroupbutton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="#6EA470"
-        android:text="Create"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/lowercard"
+        android:layout_width="339dp"
+        android:layout_height="174dp"
+        android:layout_marginBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/GroupName"
-        app:layout_constraintVertical_bias="0.173" />
+        app:layout_constraintTop_toBottomOf="@+id/uppercard">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="227dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/individualmessageto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="To"
+                    android:inputType="textPersonName" />
+
+                <EditText
+                    android:id="@+id/individualmessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:ems="10"
+                    android:gravity="start|top"
+                    android:hint="Type your message"
+                    android:inputType="textMultiLine"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/individualmessagesendbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="#6EA470"
+                android:text="Send" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/uppercard"
+        android:layout_width="339dp"
+        android:layout_height="95dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/creategroupdisplay">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/GroupName"
+                android:layout_width="238dp"
+                android:layout_height="56dp"
+                android:ems="10"
+                android:hint="Group name"
+                android:inputType="textPersonName" />
+
+            <Button
+                android:id="@+id/creategroupbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#6EA470"
+                android:gravity="right|top"
+                android:text="Create" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/sendmessagelabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send Message"
+        app:layout_constraintBottom_toTopOf="@+id/lowercard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/uppercard"
+        app:layout_constraintVertical_bias="0.905" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,8 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PChat">
-        <activity android:name=".MyGroups"></activity>
-        <activity android:name=".JoinChatroom" />
+        <activity android:name=".MyChatroom"></activity>
+        <activity android:name=".MyGroups" />
         <activity android:name=".SendInvitation" />
         <activity android:name=".CreateGroup" />
         <activity android:name=".Profile" />

@@ -10,45 +10,35 @@
         android:id="@+id/sendinvitationdisplay"
         android:layout_width="99dp"
         android:layout_height="27dp"
+        android:layout_marginTop="80dp"
         android:text="Send Invitation"
-        app:layout_constraintBottom_toTopOf="@+id/sendinvitationgroupname"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/sendinvitationgroupname"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:ems="10"
-        android:hint="group name"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/sendinvitationusername"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <EditText
         android:id="@+id/sendinvitationusername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="144dp"
+        android:layout_marginTop="104dp"
         android:ems="10"
         android:hint="user name"
         android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/sendinvitebutton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sendinvitationdisplay" />
 
     <Button
         android:id="@+id/sendinvitebutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="260dp"
+        android:layout_marginBottom="360dp"
+        android:backgroundTint="#6EA470"
         android:hint="send"
         android:text="Send"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.47"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sendinvitationusername" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,19 +1,35 @@
 package com.example.pchat;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TableRow;
 import android.widget.TextView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionConfiguration;
@@ -21,6 +37,9 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
+import org.jivesoftware.smack.chat.ChatManagerListener;
+import org.jivesoftware.smack.chat.ChatMessageListener;
+import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
@@ -28,9 +47,18 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collection;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 
 public class MyGroups extends AppCompatActivity {
@@ -42,7 +70,7 @@ public class MyGroups extends AppCompatActivity {
 
     public static final String EXTRA_NAME = "a";
     public static final String EXTRA_PWD = "b";
-    public static final String EXTRA_MSG = "c";
+    public static final String EXTRA_ROOM = "c";
 
 
     final Context context = this;
@@ -54,7 +82,18 @@ public class MyGroups extends AppCompatActivity {
 
     AbstractXMPPConnection connection;
 
+    CardView cardview,cardview2;
+    LinearLayout.LayoutParams layoutparams,layoutparams2;
 
+    RelativeLayout.LayoutParams rlayoutparams,rlayoutparams2,rlayoutparams3;
+    TextView textview,textview2;
+
+    EditText MessageToSend;
+
+    LinearLayout LinearLayoutView;
+
+    ScrollView sv;
+    CardView []cv;
 
 
 
@@ -65,23 +104,151 @@ public class MyGroups extends AppCompatActivity {
 
 
 
-        uname=getIntent().getStringExtra(Profile.EXTRA_NAME);
-        pword=getIntent().getStringExtra(Profile.EXTRA_PWD);
-
-
+        uname=getIntent().getStringExtra(MyGroups.EXTRA_NAME);
+        pword=getIntent().getStringExtra(MyGroups.EXTRA_PWD);
 
 
         new GetMyGroups().execute();
 
-        /*
-        Button mygroups_button= findViewById(R.id.MyGroupsButton);
-        mygroups_button.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                new GetMyGroups().execute();
+
+
+
+        layoutparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT );
+
+
+
+
+
+        Display display = getWindowManager().getDefaultDisplay();
+        int screenWidth = display.getWidth();
+        int screenHeight = display.getHeight();
+
+
+        sv=new ScrollView(context);
+        LinearLayoutView = new LinearLayout(this);
+        LinearLayoutView.setOrientation(LinearLayout.VERTICAL);
+
+        GroupInfoDatabaseAdapter gdba = new GroupInfoDatabaseAdapter(context);
+
+        ArrayList<String> GroupList=gdba.getAllGroups();
+
+
+        cv=new CardView[GroupList.size()];
+
+         sv=new ScrollView(context);
+
+        for (int i=0; i<GroupList.size();i++){
+
+
+
+
+            cv[i] = new CardView(context);
+
+            layoutparams.setMargins(5,5,5,5);
+            cv[i].setLayoutParams(layoutparams);
+            cv[i].setRadius(5);
+            cv[i].setPadding(5, 5, 5, 5);
+            cv[i].setCardBackgroundColor(0xFDFDFDFF);
+            cv[i].setMaxCardElevation(10);
+
+            String []firstname=GroupList.get(i).split("@");
+
+
+            textview = new TextView(context);
+            textview.setLayoutParams(layoutparams);
+
+            textview.setText(firstname[0]);
+            textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+            textview.setTextColor(Color.BLACK);
+            textview.setPadding(55,55,55,55);
+            textview.setGravity(Gravity.CENTER);
+
+
+            Button groupbutton=new Button(context);
+            groupbutton.setText(firstname[0]);
+
+            //groupbutton.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+            groupbutton.setBackgroundColor(Color.WHITE);
+            groupbutton.setPadding(25,25,25,25);
+
+            groupbutton.setTextColor(0xFF6EA470);
+            cv[i].addView(groupbutton);
+
+
+            int finalI = i;
+            groupbutton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+
+
+                    Intent intent = new Intent(context, MyChatroom.class);
+                    intent.putExtra(EXTRA_PWD, pword);
+                    intent.putExtra(EXTRA_NAME, uname);
+                    intent.putExtra(EXTRA_ROOM,GroupList.get(finalI));
+
+
+                    startActivity(intent);
+
+
+                }
+            });
+
+            //cv[i].addView(textview);
+
+            cv[i].setClickable(true);
+            LinearLayoutView.addView(cv[i]);
+
+        }
+
+
+        FloatingActionButton fab = new FloatingActionButton(this);
+        fab.setId(View.generateViewId());
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+
+
+                Intent intent = new Intent(context, CreateGroup.class);
+                intent.putExtra(EXTRA_PWD, pword);
+                intent.putExtra(EXTRA_NAME, uname);
+                startActivity(intent);
 
             }
         });
-        */
+        //fab.setImageResource(R.drawable.plus);
+        fab.setElevation(2);
+        fab.setBackgroundResource(R.drawable.plus);
+        //fab.setBackgroundDrawable(Drawable.createFromPath("/home/punnoose/plus.png"));
+       // fab.setSize(android.support.design.widget.FloatingActionButton.SIZE_MINI);
+        fab.setFocusable(true);
+
+        RelativeLayout.LayoutParams lay = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        //lay.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        //lay.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        //lay.addRule(RelativeLayout.ALIGN_PARENT_END);
+
+
+        fab.setBackgroundColor(0xFFE27070);
+        fab.setBackgroundTintList(ColorStateList.valueOf(0xFFE27070));
+
+
+        lay.setMargins(8*screenWidth/10,10,2,2);
+        fab.setLayoutParams(lay);
+
+        fab.setImageBitmap(textAsBitmap("+", 44, Color.WHITE));
+
+
+
+        LinearLayoutView.addView(fab);
+
+
+
+
+
+        sv.addView(LinearLayoutView);
+
+        setContentView(sv);
 
 
 
@@ -93,11 +260,52 @@ public class MyGroups extends AppCompatActivity {
     }//end of oncreate
 
 
+
+    protected void onDestroy(){
+        super.onDestroy();
+
+
+        if(connection.isConnected())
+        {
+            connection.disconnect();
+        }
+        uname="";
+        pword="";
+        Intent intent = new Intent(context, MainActivity.class);
+        startActivity(intent);
+
+        finish();
+    }//end of onDestroy
+
+
+
+
+
+
+    //method to convert your text to image
+    public static Bitmap textAsBitmap(String text, float textSize, int textColor) {
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setTextSize(textSize);
+        paint.setColor(textColor);
+        paint.setTextAlign(Paint.Align.LEFT);
+        float baseline = -paint.ascent(); // ascent() is negative
+        int width = (int) (paint.measureText(text) + 0.0f); // round
+        int height = (int) (baseline + paint.descent() + 0.0f);
+        Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(image);
+        canvas.drawText(text, 0, baseline, paint);
+        return image;
+    }
+
+
+
+
+
     private class  GetMyGroups extends AsyncTask<Void, Void, Void> {
         String result;
 
         final ProgressDialog dialog = new ProgressDialog(context);
-
 
 
         protected void onPreExecute() {
@@ -105,7 +313,6 @@ public class MyGroups extends AppCompatActivity {
             dialog.setMessage("Loading Groups ");
             dialog.show();
         }
-
 
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
@@ -115,17 +322,11 @@ public class MyGroups extends AppCompatActivity {
         }
 
 
-
-
-
-
         @Override
         protected Void doInBackground(Void... voids) {
 
             String userName = uname;
             String password = pword;
-
-
 
             XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
                     .setUsernameAndPassword(userName, password)
@@ -139,8 +340,7 @@ public class MyGroups extends AppCompatActivity {
                     .build();
 
 
-
-            AbstractXMPPConnection connection = new XMPPTCPConnection(config);
+             connection = new XMPPTCPConnection(config);
             ((XMPPTCPConnection) connection).setUseStreamManagement(true);           //changed from false to true
             ((XMPPTCPConnection) connection).setUseStreamManagementResumption(true); //added
             try {
@@ -155,18 +355,90 @@ public class MyGroups extends AppCompatActivity {
 
 
 
-
-
-           LinearLayout ll=findViewById(R.id.MyGroupsView);
-
-
             //already connected
             if(connection.isAuthenticated()) {
 
 
+
+
+                ChatManager chatManager = ChatManager.getInstanceFor(connection);
+                chatManager.addChatListener(
+                        new ChatManagerListener() {
+                            @Override
+                            public void chatCreated(Chat chat, boolean createdLocally)
+                            {
+                                chat.addMessageListener(new ChatMessageListener()
+                                {
+                                    @Override
+                                    public void processMessage(Chat chat, Message message) {
+
+                                                Log.d("message received", message.getBody());
+                                                  //check whether incoming message is an xml type format
+                                                int valid_xml=CheckforXML(message.getBody());
+                                                if(valid_xml==1)
+                                                {
+
+                                                    //send a roster request to the new client
+                                                    String xmlstring=message.getBody();
+                                                    DocumentBuilder builder = null;
+                                                    try {
+                                                        builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                                                    } catch (ParserConfigurationException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                    InputSource src = new InputSource();
+                                                    src.setCharacterStream(new StringReader(xmlstring));
+                                                    Document doc = null;
+                                                    try {
+                                                        doc = builder.parse(src);
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                    } catch (SAXException e) {
+                                                        e.printStackTrace();
+                                                    }
+
+                                                    //check if the type==1
+                                                    String type=doc.getElementsByTagName("type").item(0).getTextContent();
+                                                    String groupname = doc.getElementsByTagName("groupname").item(0).getTextContent();
+                                                    String jid = groupname+"@conference.pchat";
+
+
+                                                    if(type.equals("one"))
+                                                    {
+                                                       Roster roster = Roster.getInstanceFor(connection);
+                                                       roster.setSubscriptionMode(Roster.SubscriptionMode.accept_all);
+                                                        try {
+                                                            roster.createEntry(groupname, jid, null);
+                                                        } catch (SmackException.NotLoggedInException e) {
+                                                            e.printStackTrace();
+                                                        } catch (SmackException.NoResponseException e) {
+                                                            e.printStackTrace();
+                                                        } catch (XMPPException.XMPPErrorException e) {
+                                                            e.printStackTrace();
+                                                        } catch (SmackException.NotConnectedException e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                    }//end of type =1
+
+
+
+                                                }//end of valid xml
+
+
+
+
+                                    }
+                                });
+
+                                Log.w("app", chat.toString());
+                            }// end of chat created
+                        });
+
+
+
+
                 //get the roster list
                 Roster roster = Roster.getInstanceFor(connection);
-
                 if (!roster.isLoaded()) {
                     try {
                         roster.reloadAndWait();
@@ -177,61 +449,20 @@ public class MyGroups extends AppCompatActivity {
                     }
                 }
 
-
                 Collection<RosterEntry> entries = roster.getEntries();
+                InsertGroupInfoIntoDB ig=new InsertGroupInfoIntoDB();
 
-                int num_groups=entries.size();
-
-                //Log.d("Group Size",entries.size().toString());
-
+                //tuncate group db first
+                ig.truncate();
 
                 for (RosterEntry entry : entries) {
 
-
                     //String toPerson = entry.getName();
                     String groupname= entry.getName();
-
-                    Button groupbutton = new Button(context);
-                    groupbutton.setText(groupname);
-
-                    groupbutton.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
-
-
-                    runOnUiThread(new Runnable(){
-                        public void run()
-                        {
-                    ll.addView(groupbutton);
-                             }
-                    });
-
-
-
-
-                    /*
-                    EntityBareJid jid = null;
-                    ChatManager chatManager = ChatManager.getInstanceFor(connection);
-                    try {
-                        jid = JidCreate.entityBareFrom(toPerson);
-                    } catch (XmppStringprepException e) {
-                        e.printStackTrace();
-                    }
-                    Chat chat = chatManager.createChat(String.valueOf(jid));
-                    try {
-                        chat.sendMessage(MessageToSend);
-                    } catch (SmackException.NotConnectedException e) {
-                        e.printStackTrace();
-                    }
-
-                    */
-
-                    //clear the chat window
+                    ig.insertGroup(groupname);
 
                 }//end of roster entries
 
-
-                //TextView tv=new TextView(context);
-                //tv.setText(num_groups);
-                //LinearLayoutView.addView(tv);
 
 
 
@@ -244,16 +475,55 @@ public class MyGroups extends AppCompatActivity {
 
             }//end of connection
 
-
-
         return null;
         }//end of doinbackground
 
 
 
 
-    }//end of inner class
+        int CheckforXML(String ms)
+        {
+            try {
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(ms)));
+                return 1;
+            } catch (Exception e) {
+                return 0;
+            }
+        }
 
+
+
+
+
+
+
+
+        //class for  inserting groupname into the group.
+        private class InsertGroupInfoIntoDB  {
+
+            String  groupname;
+
+            public void insertGroup(String g)
+            {
+                groupname=g;
+
+                GroupInfoDatabaseAdapter gda = new GroupInfoDatabaseAdapter(context);
+                Log.d("DB created", "done");
+                gda.addGroup(groupname);
+
+            }
+
+            public void truncate() {
+
+                GroupInfoDatabaseAdapter gdb = new GroupInfoDatabaseAdapter(context);
+                gdb.truncatetable();
+
+            }
+            }//wnd of db insert class
+
+
+
+    }//end of inner class
 
 
 

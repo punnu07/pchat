@@ -125,8 +125,6 @@ public class Profile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-
-
         uname=getIntent().getStringExtra(Profile.EXTRA_NAME);
         pword=getIntent().getStringExtra(Profile.EXTRA_PWD);
 
@@ -177,7 +175,7 @@ public class Profile extends AppCompatActivity {
             public void onClick(View v){
 
 
-                Intent intent = new Intent(context, JoinChatroom.class);
+                Intent intent = new Intent(context, MyGroups.class);
                 intent.putExtra(EXTRA_PWD, pword);
                 intent.putExtra(EXTRA_NAME, uname);
                 startActivity(intent);
@@ -301,7 +299,6 @@ public class Profile extends AppCompatActivity {
 
 
     //listen for any messages
-
     private class  listenForMessages extends AsyncTask<Void, Void, Void> {
         String result;
 

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MyChatroom">
+
+
+    <TextView
+        android:id="@+id/MyRoomMUCChatwindow"
+        android:layout_width="340dp"
+        android:layout_height="383dp"
+        android:layout_marginBottom="163dp"
+        android:isScrollContainer="true"
+        android:lines="2000"
+        android:maxLength="5000"
+        android:maxLines="1000"
+
+        android:scrollbarAlwaysDrawHorizontalTrack="false"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/MyRoomMessageToSend"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.508"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/MyRoomMessageToSend"
+        android:layout_width="226dp"
+        android:layout_height="92dp"
+        android:layout_marginBottom="8dp"
+        android:ems="10"
+        android:gravity="start|top"
+        android:hint="Type your message"
+        android:inputType="textMultiLine"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/MyRoomMessageSendButton"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/MyRoomMessageSendButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#6EA470"
+        android:text="Send"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/MyRoomMessageToSend"
+        app:layout_constraintTop_toBottomOf="@+id/MyRoomMUCChatwindow"
+        app:layout_constraintVertical_bias="0.87" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButonAddUser"
+        android:layout_width="68dp"
+        android:layout_height="58dp"
+        android:clickable="true"
+        android:foregroundTint="#992323"
+        android:foregroundTintMode="add"
+        app:backgroundTint="#E27070"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.92"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.113" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
