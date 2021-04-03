@@ -55,21 +55,28 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import kotlinx.coroutines.channels.Send;
 
 
 public class MyGroups extends AppCompatActivity {
 
 
 
+    Set<String> hash_Set = new HashSet<String>();
 
 
 
     public static final String EXTRA_NAME = "a";
     public static final String EXTRA_PWD = "b";
+    public static final String EXTRA_SENDER = "c";
+
     public static final String EXTRA_ROOM = "c";
 
 
@@ -139,9 +146,6 @@ public class MyGroups extends AppCompatActivity {
 
         for (int i=0; i<GroupList.size();i++){
 
-
-
-
             cv[i] = new CardView(context);
 
             layoutparams.setMargins(5,5,5,5);
@@ -151,22 +155,14 @@ public class MyGroups extends AppCompatActivity {
             cv[i].setCardBackgroundColor(0xFDFDFDFF);
             cv[i].setMaxCardElevation(10);
 
-            String []firstname=GroupList.get(i).split("@");
 
-
-            textview = new TextView(context);
-            textview.setLayoutParams(layoutparams);
-
-            textview.setText(firstname[0]);
-            textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
-            textview.setTextColor(Color.BLACK);
-            textview.setPadding(55,55,55,55);
-            textview.setGravity(Gravity.CENTER);
+           String []firstname=GroupList.get(i).split("@");
 
 
             Button groupbutton=new Button(context);
             groupbutton.setText(firstname[0]);
 
+            hash_Set.add(firstname[0]);
             //groupbutton.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
             groupbutton.setBackgroundColor(Color.WHITE);
             groupbutton.setPadding(25,25,25,25);
@@ -359,8 +355,6 @@ public class MyGroups extends AppCompatActivity {
             if(connection.isAuthenticated()) {
 
 
-
-
                 ChatManager chatManager = ChatManager.getInstanceFor(connection);
                 chatManager.addChatListener(
                         new ChatManagerListener() {
@@ -419,13 +413,73 @@ public class MyGroups extends AppCompatActivity {
                                                             e.printStackTrace();
                                                         }
                                                     }//end of type =1
-
-
-
                                                 }//end of valid xml
+                                                //if message coming is not xml then it means that it is a message from another user
+                                                else
+                                                {
+                                                   MessageHandlerG mg=new MessageHandlerG();
+                                                   mg.ginsertMessage(message.getBody(),"null", message.getFrom().toString(),"null","yes");
+                                                    String []messageFrom=message.getFrom().split("@");
 
 
+                                                    if(!hash_Set.contains(messageFrom[0]))                                                    //groupbutton.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+                                                    {
 
+                                                        hash_Set.add(messageFrom[0]);
+
+                                                        CardView cvv = new CardView(context);
+
+                                                        layoutparams.setMargins(5, 5, 5, 5);
+                                                        cvv.setLayoutParams(layoutparams);
+                                                        cvv.setRadius(5);
+                                                        cvv.setPadding(5, 5, 5, 5);
+                                                        cvv.setCardBackgroundColor(0xFDFDFDFF);
+                                                        cvv.setMaxCardElevation(10);
+
+
+                                                        Button groupbutton = new Button(context);
+
+
+                                                        groupbutton.setText(messageFrom[0]);
+
+                                                        groupbutton.setBackgroundColor(Color.WHITE);
+                                                        groupbutton.setPadding(25, 25, 25, 25);
+
+                                                        groupbutton.setTextColor(0xFF6EA470);
+                                                        cvv.addView(groupbutton);
+
+
+                                                        groupbutton.setOnClickListener(new View.OnClickListener() {
+                                                            public void onClick(View v) {
+
+                                                                Intent intent = new Intent(context, IndividualChat.class);
+                                                                intent.putExtra(EXTRA_PWD, pword);
+                                                                intent.putExtra(EXTRA_NAME, uname);
+                                                               intent.putExtra(EXTRA_SENDER, messageFrom[0]);
+                                                               startActivity(intent);
+
+
+                                                            }
+                                                        });
+
+                                                        //cv[i].addView(textview);
+
+                                                        cvv.setClickable(true);
+
+
+                                                        runOnUiThread(new Runnable() {
+                                                            public void run() {
+
+                                                                LinearLayoutView.addView(cvv);
+                                                                //sv.addView();
+                                                            }
+                                                        });
+
+
+                                                    }//add to user list
+
+
+                                                }//end of individual message
 
                                     }
                                 });
@@ -466,14 +520,7 @@ public class MyGroups extends AppCompatActivity {
 
 
 
-
-
-
-
-
-
-
-            }//end of connection
+           }//end of connection
 
         return null;
         }//end of doinbackground
@@ -519,11 +566,107 @@ public class MyGroups extends AppCompatActivity {
                 gdb.truncatetable();
 
             }
-            }//wnd of db insert class
+        }//wnd of db insert class
+
+
+
+
+        //class for db for message storing
+
+
+        private class MessageHandlerG
+        {
+            MessageStoreDatabaseAdapter gdba1,gdba2,gdba3;
+
+            MessageHandlerG()
+            {
+
+
+            }
+            public void gclearchat()
+            {
+                gdba3=new MessageStoreDatabaseAdapter(context);
+                gdba3.truncatetable();
+            }
+
+
+            public void ginsertMessage(String msg, String time, String sender, String groupname, String individual_message)
+            {
+                gdba1=new MessageStoreDatabaseAdapter(context);
+                long a= gdba1.addMessage(msg,time, sender, groupname, individual_message);
+            }
+
+
+            public ArrayList<String> ggetAllMessage()
+            {
+                gdba2=new MessageStoreDatabaseAdapter(context);
+                ArrayList<String > MessageArrayList=gdba2.getAllMessage();
+                return MessageArrayList;
+            }
+
+
+
+
+            public ArrayList<String> ggetAllTime()
+            {
+                gdba2=new MessageStoreDatabaseAdapter(context);
+                ArrayList<String > TimeArrayList=gdba2.getAllTime();
+                return TimeArrayList;
+            }
+
+
+
+            public ArrayList<String> ggetAllSender()
+            {
+                gdba2=new MessageStoreDatabaseAdapter(context);
+                ArrayList<String > SenderArrayList=gdba2.getAllSender();
+                return SenderArrayList;
+            }
+
+
+            public ArrayList<String> ggetAllGroupName()
+            {
+                gdba2=new MessageStoreDatabaseAdapter(context);
+                ArrayList<String > GroupNameArrayList=gdba2.getAllGroupname();
+                return GroupNameArrayList;
+            }
+
+
+            public ArrayList<String> ggetAllIndividual_Message()
+            {
+                gdba2=new MessageStoreDatabaseAdapter(context);
+                ArrayList<String > IndividualMessageArrayList=gdba2.getAllIndividualMessage();
+                return IndividualMessageArrayList;
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+        }//end of class
+
+
+
+
+
+
+
 
 
 
     }//end of inner class
+
+
+
+
+
 
 
 

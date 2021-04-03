@@ -323,7 +323,7 @@ public class MyChatroom extends AppCompatActivity {
                     public void processMessage(Message message) {
 
                         Log.d("message",message.getBody());
-                        mh.insertMessage(message.getBody(),"null",message.getFrom().toString(),"null");
+                        mh.insertMessage(message.getBody(),"null",message.getFrom().toString(),"null","no");
                         String []address=message.getFrom().split("/");
 
 
@@ -581,10 +581,10 @@ public class MyChatroom extends AppCompatActivity {
         }
 
 
-        public void insertMessage(String msg, String time, String fromwhom, String whichdb)
+        public void insertMessage(String msg, String time, String fromwhom, String whichdb, String individual_message)
         {
             dba1=new MessageStoreDatabaseAdapter(context);
-            long a= dba1.addMessage(msg,time,fromwhom, whichdb);
+            long a= dba1.addMessage(msg,time,fromwhom, whichdb, individual_message);
         }
 
 
@@ -595,6 +595,16 @@ public class MyChatroom extends AppCompatActivity {
             return MessageArrayList;
         }
     }//end of class
+
+
+
+
+
+
+
+
+
+
 
 
 

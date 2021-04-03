@@ -19,6 +19,8 @@ import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.chat.Chat;
+import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.Roster;
@@ -77,6 +79,22 @@ public class CreateGroup extends AppCompatActivity {
 
                 }
         });
+
+
+
+
+        Button individualmessagesend_button= findViewById(R.id.individualmessagesendbutton);
+        individualmessagesend_button.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+
+                new individualmessagesend().execute();
+
+
+            }
+        });
+
+
+
 
 
 
@@ -245,8 +263,6 @@ public class CreateGroup extends AppCompatActivity {
             }//end of connection
 
 
-            //disconnect the connection
-            connection.disconnect();
 
 
             return null;
@@ -256,6 +272,143 @@ public class CreateGroup extends AppCompatActivity {
 
     }//end of inner class
 
+
+
+
+
+
+
+    //next inner class
+
+    private class  individualmessagesend extends AsyncTask<Void, Void, Void> {
+        String result;
+
+
+        final ProgressDialog dialog = new ProgressDialog(context);
+
+
+
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.setMessage("Sending");
+            dialog.show();
+        }
+
+
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+
+            /*
+            //after group creation go back to the profile
+            Intent intent = new Intent(context, MyGroups.class);
+            intent.putExtra(EXTRA_PWD, pword);
+            intent.putExtra(EXTRA_NAME, uname);
+            startActivity(intent);
+
+             */
+        }
+
+
+
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            String userName=uname;
+            String password=pword;
+
+            XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
+                    .setUsernameAndPassword(userName, password)
+                    .setServiceName("pchat")
+                    .setHost("3.139.90.132")
+                    .setPort(5222)
+                    .setConnectTimeout(25000)
+                    .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled) // Do not disable TLS except for test purposes!
+                    .setDebuggerEnabled(true)
+                    .setSendPresence(true)
+                    .build();
+
+
+
+            AbstractXMPPConnection connection = new XMPPTCPConnection(config);
+            ((XMPPTCPConnection) connection).setUseStreamManagement(true);           //changed from false to true
+            ((XMPPTCPConnection) connection).setUseStreamManagementResumption(true); //added
+            try {
+                connection.connect().login();
+            } catch (XMPPException e) {
+                e.printStackTrace();
+            } catch (SmackException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            //already connected
+            if(connection.isAuthenticated())
+            {
+
+
+
+                EditText et;
+                et=(EditText)findViewById(R.id.individualmessageto);
+                String toPerson=et.getText().toString()+"@pchat";
+
+                et=(EditText)findViewById(R.id.individualmessage);
+                String Messagetosend=et.getText().toString();
+
+                EntityBareJid jid = null;
+                ChatManager chatManager = ChatManager.getInstanceFor(connection);
+                try {
+                    jid = JidCreate.entityBareFrom(toPerson);
+                } catch (XmppStringprepException e) {
+                    e.printStackTrace();
+                }
+                Chat chat = chatManager.createChat(String.valueOf(jid));
+                try {
+                    chat.sendMessage(Messagetosend);
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                }
+
+
+                //clear the chat window
+
+
+
+                runOnUiThread(new Runnable(){
+                    public void run() {
+
+                       EditText ett=(EditText)findViewById(R.id.individualmessage);
+
+                        ett.setText("");
+
+                        ett=(EditText)findViewById(R.id.individualmessageto);
+                        ett.setText("");
+
+
+
+                    }
+                });
+
+
+
+
+
+            }//end of connection
+
+
+
+
+
+            return null;
+        }//end of do in background
+
+
+
+    }//end of inner class
 
 
 
