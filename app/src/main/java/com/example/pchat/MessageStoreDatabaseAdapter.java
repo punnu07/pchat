@@ -22,11 +22,13 @@ public class MessageStoreDatabaseAdapter extends SQLiteOpenHelper {
     private static final String KEY_THIRDNAME = "sender";
     private static final String KEY_FOURTHNAME = "group_name";
     private static final String KEY_FIFTHNAME = "individual_message"; //if individaul message flag is "yes", then message from person
+    private static final String KEY_SIXTHNAME = "recepient";
+    private static final String KEY_SEVENTHNAME = "type";
 
     /* CREATE TABLE students (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, phone_number TEXT); */
 
     private static final String CREATE_TABLE_COMMAND = "CREATE TABLE "
-            + TABLE_NAME + "(" + KEY_FIRSTNAME + " TEXT," + KEY_SECONDNAME + " TEXT," + KEY_THIRDNAME + " TEXT," + KEY_FOURTHNAME + " TEXT," + KEY_FIFTHNAME + " TEXT);";
+            + TABLE_NAME + "(" + KEY_FIRSTNAME + " TEXT," + KEY_SECONDNAME + " TEXT," + KEY_THIRDNAME + " TEXT," + KEY_FOURTHNAME + " TEXT," + KEY_FIFTHNAME+ " TEXT,"+KEY_SIXTHNAME+" TEXT,"+KEY_SEVENTHNAME+" TEXT);";
 
 
     public MessageStoreDatabaseAdapter(Context context) {
@@ -47,7 +49,7 @@ public class MessageStoreDatabaseAdapter extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public long addMessage(String message, String time, String sender, String groupname, String individual_message) {
+    public long addMessage(String message, String time, String sender, String groupname, String individual_message, String recepient, String type) {
         SQLiteDatabase db = this.getWritableDatabase();
         // Creating content values
         ContentValues values = new ContentValues();
@@ -56,7 +58,8 @@ public class MessageStoreDatabaseAdapter extends SQLiteOpenHelper {
         values.put(KEY_THIRDNAME, sender);
         values.put(KEY_FOURTHNAME, groupname);
         values.put(KEY_FIFTHNAME, individual_message);
-
+        values.put(KEY_SIXTHNAME, recepient);
+        values.put(KEY_SEVENTHNAME, type);
 
         // insert row in students table
         long insert = db.insert(TABLE_NAME, null, values);
@@ -141,6 +144,7 @@ public class MessageStoreDatabaseAdapter extends SQLiteOpenHelper {
     }
 
 
+
     public ArrayList<String> getAllSender() {
         ArrayList<String> senderArrayList = new ArrayList<String>();
         String sender = "";
@@ -160,6 +164,8 @@ public class MessageStoreDatabaseAdapter extends SQLiteOpenHelper {
         db.close();
         return senderArrayList;
     }
+
+
 
 
     public ArrayList<String> getAllGroupname() {
@@ -202,5 +208,57 @@ public class MessageStoreDatabaseAdapter extends SQLiteOpenHelper {
         db.close();
         return individualmessageArrayList;
     }
+
+
+
+
+
+    public ArrayList<String> getAllRecepients() {
+        ArrayList<String> recepientArrayList = new ArrayList<String>();
+        String rec = "";
+        String selectQuery = "SELECT  * FROM " + TABLE_NAME;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+
+            do {
+                rec = c.getString(c.getColumnIndex(KEY_SIXTHNAME));
+                recepientArrayList.add(rec);
+            } while (c.moveToNext());
+
+            Log.d("array", recepientArrayList.toString());
+        }
+        db.close();
+        return recepientArrayList;
+    }
+
+
+
+
+
+    public ArrayList<String> getAllType() {
+        ArrayList<String> typeArrayList = new ArrayList<String>();
+        String type = "";
+        String selectQuery = "SELECT  * FROM " + TABLE_NAME;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+
+            do {
+                type = c.getString(c.getColumnIndex(KEY_SEVENTHNAME));
+                typeArrayList.add(type);
+            } while (c.moveToNext());
+
+            Log.d("array", typeArrayList.toString());
+        }
+        db.close();
+        return typeArrayList;
+    }
+
+
+
+
 
 }

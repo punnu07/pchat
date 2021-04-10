@@ -46,6 +46,8 @@ public class CreateGroup extends AppCompatActivity {
     public static final String EXTRA_NAME = "a";
     public static final String EXTRA_PWD = "b";
     public static final String EXTRA_MSG = "c";
+    public static final String EXTRA_SENDER = "c";
+
 
 
 
@@ -87,7 +89,23 @@ public class CreateGroup extends AppCompatActivity {
         individualmessagesend_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
 
-                new individualmessagesend().execute();
+
+
+                EditText et;
+                et=(EditText)findViewById(R.id.individualmessageto);
+                String toPerson=et.getText().toString();
+
+
+
+                Intent intent = new Intent(context, IndividualChat2.class);
+                intent.putExtra(EXTRA_PWD, pword);
+                intent.putExtra(EXTRA_NAME, uname);
+                intent.putExtra(EXTRA_SENDER, toPerson);
+                startActivity(intent);
+
+
+
+                //new individualmessagesend().execute();
 
 
             }

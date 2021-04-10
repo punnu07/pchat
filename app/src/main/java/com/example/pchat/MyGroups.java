@@ -131,13 +131,14 @@ public class MyGroups extends AppCompatActivity {
         int screenHeight = display.getHeight();
 
 
-        sv=new ScrollView(context);
+        //sv=new ScrollView(context);
         LinearLayoutView = new LinearLayout(this);
         LinearLayoutView.setOrientation(LinearLayout.VERTICAL);
 
         GroupInfoDatabaseAdapter gdba = new GroupInfoDatabaseAdapter(context);
 
         ArrayList<String> GroupList=gdba.getAllGroups();
+
 
 
         cv=new CardView[GroupList.size()];
@@ -193,7 +194,108 @@ public class MyGroups extends AppCompatActivity {
             cv[i].setClickable(true);
             LinearLayoutView.addView(cv[i]);
 
-        }
+        }//end of all the groups
+
+
+
+        //now add the individual senders
+        MessageStoreDatabaseAdapter msda=new MessageStoreDatabaseAdapter(context);
+        ArrayList <String> userList=msda.getAllSender();
+        ArrayList <String> recList=msda.getAllRecepients();
+
+
+        ArrayList <String> Individualsenderlist=msda.getAllIndividualMessage();
+
+
+
+        for(int i=0;i<userList.size();i++)
+        {
+            String user= userList.get(i);
+
+            if(!hash_Set.contains(user) && !hash_Set.contains(recList.get(i)) && Individualsenderlist.get(i).equals("yes")) {
+
+                if(user.equals(uname))
+                {
+                    hash_Set.add(recList.get(i));
+                }
+                else
+                    {
+                    hash_Set.add(user);
+                }
+
+                CardView cvv = new CardView(context);
+
+                layoutparams.setMargins(5, 5, 5, 5);
+                cvv.setLayoutParams(layoutparams);
+                cvv.setRadius(5);
+                cvv.setPadding(5, 5, 5, 5);
+                cvv.setCardBackgroundColor(0xFDFDFDFF);
+                cvv.setMaxCardElevation(10);
+
+
+                Button groupbutton = new Button(context);
+
+
+                if(user.equals(uname))
+                {
+                    groupbutton.setText(recList.get(i));
+                }
+                else {
+                    groupbutton.setText(user);
+                }
+                    groupbutton.setBackgroundColor(Color.WHITE);
+                groupbutton.setPadding(25, 25, 25, 25);
+
+                groupbutton.setTextColor(0xFF6EA470);
+
+
+
+                cvv.addView(groupbutton);
+
+
+                int finalI = i;
+                groupbutton.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+
+                        //Intent intent = new Intent(context, IndividualChat.class);
+                        Intent intent = new Intent(context, IndividualChat2.class);
+                        intent.putExtra(EXTRA_PWD, pword);
+                        intent.putExtra(EXTRA_NAME, uname);
+
+
+
+                        if(user.equals(uname)) {
+                            intent.putExtra(EXTRA_SENDER, recList.get(finalI));
+                        }
+                         else
+                        {
+                            intent.putExtra(EXTRA_SENDER, user);
+                        }
+
+
+                        startActivity(intent);
+
+
+                    }
+                });
+
+                //cv[i].addView(textview);
+
+                cvv.setClickable(true);
+
+                LinearLayoutView.addView(cvv);
+            }
+
+
+       }
+
+
+
+
+
+
+
+
 
 
         FloatingActionButton fab = new FloatingActionButton(this);
@@ -393,13 +495,15 @@ public class MyGroups extends AppCompatActivity {
 
                                                     //check if the type==1
                                                     String type=doc.getElementsByTagName("type").item(0).getTextContent();
-                                                    String groupname = doc.getElementsByTagName("groupname").item(0).getTextContent();
-                                                    String jid = groupname+"@conference.pchat";
 
-
+                                                    //one means a user has to be added to a group
                                                     if(type.equals("one"))
                                                     {
-                                                       Roster roster = Roster.getInstanceFor(connection);
+
+                                                        String groupname = doc.getElementsByTagName("groupname").item(0).getTextContent();
+                                                        String jid = groupname+"@conference.pchat";
+
+                                                        Roster roster = Roster.getInstanceFor(connection);
                                                        roster.setSubscriptionMode(Roster.SubscriptionMode.accept_all);
                                                         try {
                                                             roster.createEntry(groupname, jid, null);
@@ -413,10 +517,44 @@ public class MyGroups extends AppCompatActivity {
                                                             e.printStackTrace();
                                                         }
                                                     }//end of type =1
+
+                                                    //type=2 means individual text message with time
+                                                    if(type.equals("two")) {
+
+                                                        String content = doc.getElementsByTagName("content").item(0).getTextContent();
+                                                        String time =  doc.getElementsByTagName("time").item(0).getTextContent();
+
+                                                        String sender =  doc.getElementsByTagName("sender").item(0).getTextContent();
+
+
+                                                        MessageHandlerG mggg=new MessageHandlerG();
+                                                        mggg.ginsertMessage(content,time, sender,"null","yes",uname,"two");
+
+
+                                                    }
+
+
+
+                                                    /*
+
+                                                    if(type.equals("three"))
+                                                    {
+
+                                                        MessageHandlerG mgg=new MessageHandlerG();
+                                                        mgg.ginsertMessage(message.getBody(),"null", message.getFrom().toString(),"null","yes");
+
+
+                                                    }//end of type =3
+
+                                                       */
+
+
                                                 }//end of valid xml
-                                                //if message coming is not xml then it means that it is a message from another user
+                                                //if message coming is not xml then it means that it is a message from another user and a text message
                                                 else
                                                 {
+
+                                                    /*
                                                    MessageHandlerG mg=new MessageHandlerG();
                                                    mg.ginsertMessage(message.getBody(),"null", message.getFrom().toString(),"null","yes");
                                                     String []messageFrom=message.getFrom().split("@");
@@ -452,11 +590,13 @@ public class MyGroups extends AppCompatActivity {
                                                         groupbutton.setOnClickListener(new View.OnClickListener() {
                                                             public void onClick(View v) {
 
-                                                                Intent intent = new Intent(context, IndividualChat.class);
+                                                                //Intent intent = new Intent(context, IndividualChat.class);
+
+                                                                Intent intent = new Intent(context, IndividualChat2.class);
                                                                 intent.putExtra(EXTRA_PWD, pword);
                                                                 intent.putExtra(EXTRA_NAME, uname);
-                                                               intent.putExtra(EXTRA_SENDER, messageFrom[0]);
-                                                               startActivity(intent);
+                                                                intent.putExtra(EXTRA_SENDER, messageFrom[0]);
+                                                                startActivity(intent);
 
 
                                                             }
@@ -479,9 +619,12 @@ public class MyGroups extends AppCompatActivity {
                                                     }//add to user list
 
 
+
+                                                    */
+
                                                 }//end of individual message
 
-                                    }
+                                    } //end of process message
                                 });
 
                                 Log.w("app", chat.toString());
@@ -590,10 +733,10 @@ public class MyGroups extends AppCompatActivity {
             }
 
 
-            public void ginsertMessage(String msg, String time, String sender, String groupname, String individual_message)
+            public void ginsertMessage(String msg, String time, String sender, String groupname, String individual_message, String rec, String type)
             {
                 gdba1=new MessageStoreDatabaseAdapter(context);
-                long a= gdba1.addMessage(msg,time, sender, groupname, individual_message);
+                long a= gdba1.addMessage(msg,time, sender, groupname, individual_message, rec,type);
             }
 
 
@@ -640,6 +783,13 @@ public class MyGroups extends AppCompatActivity {
             }
 
 
+
+            public ArrayList<String> ggetAllType()
+            {
+                gdba2=new MessageStoreDatabaseAdapter(context);
+                ArrayList<String > TypeArrayList=gdba2.getAllType();
+                return TypeArrayList;
+            }
 
 
 

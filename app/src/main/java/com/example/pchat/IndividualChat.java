@@ -1,17 +1,28 @@
 package com.example.pchat;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
+
+import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.icu.text.SimpleDateFormat;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
@@ -25,12 +36,20 @@ import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smackx.filetransfer.FileTransferListener;
+import org.jivesoftware.smackx.filetransfer.FileTransferManager;
+import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
+import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
+import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.jxmpp.jid.EntityBareJid;
+import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class IndividualChat extends AppCompatActivity {
 
@@ -51,6 +70,13 @@ public class IndividualChat extends AppCompatActivity {
     public String sender="";
 
     AbstractXMPPConnection connection;
+
+
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+    private Bitmap mImageBitmap;
+    private String mCurrentPhotoPath;
+    private ImageView mImageView;
+
 
 
     @Override
@@ -115,12 +141,81 @@ public class IndividualChat extends AppCompatActivity {
 
 
 
+        //file upload testing
+        Button picbutton=findViewById(R.id.pic);
+        picbutton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            public void onClick(View v) {
+
+
+
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (cameraIntent.resolveActivity(getPackageManager()) != null) {
+                    // Create the File where the photo should go
+                    File photoFile = null;
+                    try {
+                        photoFile = createImageFile();
+                    } catch (IOException ex) {
+                        // Error occurred while creating the File
+                        Log.i("Camera", "IOException");
+                    }
+                    // Continue only if the File was successfully created
+                    if (photoFile != null) {
+                        Uri photoURI = FileProvider.getUriForFile(context, "com.example.pchat.fileprovider",
+                                photoFile);
+
+                        //cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+
+                       cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+
+                        startActivityForResult(cameraIntent, REQUEST_IMAGE_CAPTURE);
+                    }
+                }
+
+
+
+
+
+            }
+        });
+
+
+
+
 
     }//end of oncreate
 
 
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(imageFileName,   ".jpg",     storageDir  );
 
+       // File f = new File(android.os.Environment.getExternalStorageDirectory(), "temp.jpg");
+
+        //Log.d("Image Path", storageDir.toString());
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        Log.d("Image Path", mCurrentPhotoPath);
+        return image;
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+
+
+            new FileUpload().execute();
+
+
+        }
+    }
 
 
 
@@ -234,7 +329,37 @@ public class IndividualChat extends AppCompatActivity {
                                 Log.w("app", chat.toString());
                             }
                         });
-            }//end of received message
+
+
+
+                /*
+
+             //handler for file accept
+                FileTransferManager fileTransferManager = FileTransferManager.getInstanceFor(connection);
+                fileTransferManager.addFileTransferListener(new FileTransferListener() {
+                    @Override
+                    public void fileTransferRequest(final FileTransferRequest request) {
+// Accept it
+
+                        IncomingFileTransfer transfer = request.accept();
+                        try {
+                            transfer.recieveFile(new File(dir_path+request.getFileName()));
+                        } catch (SmackException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+                 */
+
+
+
+}//end of received message
 
 
             return null;
@@ -346,6 +471,10 @@ public class IndividualChat extends AppCompatActivity {
 
 
 
+
+
+
+
     private class MessageHandlerP
     {
         MessageStoreDatabaseAdapter pdba1,pdba2,pdba3;
@@ -413,6 +542,104 @@ public class IndividualChat extends AppCompatActivity {
 
 
     }//end of class
+
+
+
+
+
+
+    //file upload  testing
+
+    //class for sending the private message
+    private class FileUpload  extends AsyncTask<Void, Void, Void> {
+
+
+        String result;
+        final ProgressDialog dialog = new ProgressDialog(context);
+
+
+
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.setMessage("Uploading...");
+            dialog.show();
+        }
+
+
+
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        }
+
+
+
+
+
+        protected Void doInBackground(Void... voids) {
+
+
+            String userName=uname;
+            String password=pword;
+
+
+            if(connection.isAuthenticated())
+            {
+
+
+                String toUser="mine@pchat";
+                String description="file transfer check";
+
+
+
+/*
+                HttpFileUploadManager manager = HttpFileUploadManager.getInstanceFor(Connection);
+                try {
+                    Slot slot = manager.requestSlot(path, 10000);
+
+                    uploadFileToSlot(new File(path), slot);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (XMPPException.XMPPErrorException e) {
+                    e.printStackTrace();
+                } catch (SmackException e) {
+                    e.printStackTrace();
+                }
+
+*/
+
+
+
+
+
+
+                Log.d("Image",mCurrentPhotoPath);
+
+                OutgoingFileTransfer transfer = FileTransferManager.getInstanceFor(connection).createOutgoingFileTransfer("mine@pchat:5222/Smack");
+                try {
+                    Log.d("Image",mCurrentPhotoPath);
+                    transfer.sendFile(new File(mCurrentPhotoPath), description);
+                } catch (SmackException e) {
+                    e.printStackTrace();
+                }
+
+
+            }//end of received message
+
+
+            return null;
+        }//end of do in background
+
+
+    }//end of inner class
+
+
+
+
+
+
 
 
 
