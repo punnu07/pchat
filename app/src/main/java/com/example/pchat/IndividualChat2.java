@@ -1,4 +1,4 @@
-package com.example.pchat;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            package com.example.pchat;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,6 +42,8 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionConfiguration;
@@ -99,11 +101,9 @@ import okio.Buffer;
 import okio.BufferedSink;
 import okio.BufferedSource;
 import okio.Okio;
-
+                                                                                                                                                                                                                                                                                                                                        
 
 public class IndividualChat2 extends AppCompatActivity {
-
-
 
 
 
@@ -131,6 +131,8 @@ public class IndividualChat2 extends AppCompatActivity {
     private String mCurrentPhotoPath;
     private ImageView mImageView;
 
+
+    private String ImageDownloadedPath="";
 
 
     CardView cardview,cardview2;
@@ -163,7 +165,7 @@ public class IndividualChat2 extends AppCompatActivity {
 
         IndividualChat2.MessageHandlerP mp=new IndividualChat2.MessageHandlerP();
 
-        ArrayList <String>  senderList=mp.pgetAllSender();
+        ArrayList <String> senderList=mp.pgetAllSender();
         ArrayList <String> messageList=mp.pgetAllMessage();
         ArrayList <String> Individualmessage=mp.pgetAllIndividual_Message();
         ArrayList <String> timeList=mp.pgetAllTime();
@@ -301,7 +303,6 @@ public class IndividualChat2 extends AppCompatActivity {
         layoutparams2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT );
         layoutParamsimg=new LinearLayout.LayoutParams(screenWidth/2, screenWidth/2 );
 
-
         sv=new ScrollView(context);
 
         LinearLayoutView = new LinearLayout(this);
@@ -310,15 +311,12 @@ public class IndividualChat2 extends AppCompatActivity {
         LinearLayoutViewBig = new LinearLayout(this);
         LinearLayoutViewBig.setOrientation(LinearLayout.VERTICAL);
 
-
         int num_messages_to_display=0;
         String sendername;
-
 
         //get the num of cards to display
         for(int i=0;i<messageList.size();i++)
         {
-
             sendername=senderList.get(i);
             if(sendername.equals(sender) && Individualmessage.get(i).equals("yes"))
             {
@@ -331,10 +329,7 @@ public class IndividualChat2 extends AppCompatActivity {
                 //messagetoDisplay=messagetoDisplay+"\n\n"+sender+":"+messageList.get(i);
             }
 
-
         }
-
-
 
 
         cv=new CardView[num_messages_to_display];
@@ -385,7 +380,7 @@ public class IndividualChat2 extends AppCompatActivity {
                            String []messagetime=timeList.get(i).split("-");
                            int  messagedate=Integer.valueOf(messagetime[0]);
                            String timeval=messagetime[3]+":"+messagetime[4];
-                           String dateval=messagetime[0]+":"+messagetime[1]+":"+messagetime[2];
+                           String dateval=messagetime[0]+"/"+messagetime[1]+"/"+messagetime[2];
                            if(todaydate==messagedate)
                            {
                                tv.setTextSize(6);
@@ -429,7 +424,7 @@ public class IndividualChat2 extends AppCompatActivity {
                             String []messagetime=timeList.get(i).split("-");
                             int  messagedate=Integer.valueOf(messagetime[0]);
                             String timeval=messagetime[3]+":"+messagetime[4];
-                            String dateval=messagetime[0]+":"+messagetime[1]+":"+messagetime[2];
+                            String dateval=messagetime[0]+"/"+messagetime[1]+"/"+messagetime[2];
                             if(todaydate==messagedate)
                             {
                                 tv.setTextSize(10);
@@ -471,31 +466,69 @@ public class IndividualChat2 extends AppCompatActivity {
 
                    if(type.equals("three")) {
 
-                       /*
-                        String imgurl=doc.getElementsByTagName("path").item(0).getTextContent();
-                        //download the image
-                        try {
-                            downloadImage(imgurl);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        */
+
+                        String imgurl=messageList.get(i);
+                        String imgpath;
+                        Log.d("imgurl", imgurl);
+
+                            //imgpath=  downloadImage(imgurl);
+                            TextView tv=new TextView(context);
+                            tv.setLayoutParams(layoutparams);
+
+
+                            if(senderList.get(i).equals(uname)) {
+                               tv.setText("me:\n");
+                            }
+
+                            if(senderList.get(i).equals(sender)) {
+                                tv.setText("me:\n");
+                            }
+
+
+                            CardView cvi = new CardView(context);
+                            layoutparams.setMargins(15,15,15,15);
+                            cvi.setLayoutParams(layoutparams);
+                            cvi.setRadius(5);
+                            cvi.setPadding(15, 5, 15, 5);
+                            cvi.setCardBackgroundColor(0xFFFFFFCC);
+                            cvi.setMaxCardElevation(10);
+
+                            cvi.addView(tv);
+
+
+
+
+                            //At this point add the image to the present chat window
+                            ImageView imageView = new ImageView(context);
+                            imageView.setLayoutParams(layoutParamsimg);
+
+
+                            Picasso.with(context).load(imgurl).into(imageView);
+
+
+                            //imageView.setImageDrawable(Drawable.createFromPath(imgpath));
+
+
+                            CardView cvt = new CardView(context);
+                            layoutparams.setMargins(15,15,15,15);
+                            cvt.setLayoutParams(layoutParamsimg);
+                            cvt.setRadius(5);
+                            cvt.setPadding(15, 5, 15, 5);
+                            cvt.setCardBackgroundColor(0xFFFFFFCC);
+                            cvt.setMaxCardElevation(10);
+                            cvt.addView(imageView);
+
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    LinearLayoutView.addView(cvi);
+                                    LinearLayoutView.addView(cvt);
+
+                                }
+                            });
 
                     }//end of type 3
 
-
-
-
-
             }//end of relevant message between sender and uname
-
-
-
-
-
-
-
-
 
 
         }//end of messages
@@ -539,32 +572,25 @@ public class IndividualChat2 extends AppCompatActivity {
         rlayoutparams3.alignWithParent=true;
 
 
-
         rlayoutparams3.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         ett.setLayoutParams(rlayoutparams3);
         ett.setGravity(Gravity.BOTTOM);
         ett.setTextSize(14);
         ett.setId(303030);
 
+
+        rlayoutparams2.setMargins(5,5,5,15);
         cvv.addView(ett);
         cvv.setLayoutParams(rlayoutparams2);
         rlayoutView.addView(cvv);
-
-
-
-
-
-
 
 
         rlayoutparams2.height=2*screenHeight/10;
         rlayoutparams2.width=rlayoutparams3.width;
         rlayoutparams.setMargins(15,15,15,35);
 
-      rlayoutparams2.addRule(RelativeLayout.BELOW,101010);
-      rlayoutparams2.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-
-
+        rlayoutparams2.addRule(RelativeLayout.BELOW,101010);
+        rlayoutparams2.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 
 
 
@@ -648,7 +674,6 @@ public class IndividualChat2 extends AppCompatActivity {
             public void onClick(View v) {
 
 
-
                 Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (cameraIntent.resolveActivity(getPackageManager()) != null) {
                     // Create the File where the photo should go
@@ -670,26 +695,11 @@ public class IndividualChat2 extends AppCompatActivity {
 
                         // cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
                         startActivityForResult(cameraIntent, REQUEST_IMAGE_CAPTURE);
-
                     }
                 }
 
-
-
-
-
-
-
-
             }
         });
-
-
-
-
-
-
-
 
 
 
@@ -751,15 +761,12 @@ if(connection.isConnected())
             }
 
 
-
             new IndividualChat2.FileUpload().execute();
 
 
 
         }
     }
-
-
 
 
 
@@ -790,15 +797,10 @@ if(connection.isConnected())
 
 
 
-
-
         protected Void doInBackground(Void... voids) {
-
 
             String userName=uname;
             String password=pword;
-
-
 
             XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
                     .setUsernameAndPassword(userName, password)
@@ -848,8 +850,6 @@ if(connection.isConnected())
                                 {
                                     @Override
                                     public void processMessage(Chat chat, Message message) {
-
-
 
                                         Log.d("message received", message.getBody());
                                         //check whether incoming message is an xml type format
@@ -917,9 +917,7 @@ if(connection.isConnected())
                                                 int todaydate=Integer.valueOf(nowtime[0]);
 
                                                 //receiver is uname
-
                                                 //first inserrt the message into the db
-
                                                 MessageHandlerP mp=new MessageHandlerP();
                                                 mp.pinsertMessage(content,time,fromwhom,"null","yes",uname,"two");
 
@@ -938,9 +936,6 @@ if(connection.isConnected())
 
                                                     LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) cvj.getLayoutParams();
                                                     lp.gravity=Gravity.LEFT;
-
-
-
 
                                                     TextView tv=new TextView(context);
                                                     tv.setLayoutParams(layoutparams);
@@ -984,43 +979,31 @@ if(connection.isConnected())
                                                     }
                                                     cvj.addView(tv);
                                                     runOnUiThread(new Runnable() {
-                                                                      public void run() {
-
-                                                                          LinearLayoutView.addView(cvj);
-                                                                      }
+                                                       public void run() {
+                                                           LinearLayoutView.addView(cvj);
+                                                         }
 
                                                     });
 
                                                 }//if sender is the  current window
 
-
-
-
-
-
                                             }//end of two
 
 
-
-
-
-
-                                            /*
                                             if(type.equals("three"))
                                             {
-                                                String []sendername=message.getFrom().split("@");
-                                                if(sendername[0].equals(sender)) {//display it in the screen
+                                                String content = doc.getElementsByTagName("content").item(0).getTextContent();
+                                                String time =  doc.getElementsByTagName("time").item(0).getTextContent();
+                                                String fromwhom =  doc.getElementsByTagName("sender").item(0).getTextContent();
 
-                                                    String imgurl=doc.getElementsByTagName("path").item(0).getTextContent();
-
-
-
-
+                                                MessageHandlerP mppp=new MessageHandlerP();
+                                                mppp.pinsertMessage(content,time, fromwhom,"null","yes",uname,"three");
 
 
 
+                                                if(fromwhom.equals(sender)) {//display it in the screen
 
-
+                                                    String imgurl=content;
                                                     TextView tv=new TextView(context);
                                                     tv.setLayoutParams(layoutparams);
                                                     tv.setText(sender+":\n");
@@ -1034,11 +1017,31 @@ if(connection.isConnected())
                                                     cvi.setCardBackgroundColor(0xFFF8DE7E);
                                                     cvi.setMaxCardElevation(10);
 
-                                                    cvi.addView(tv);
+
+                                                    ImageView imageView = new ImageView(context);
+                                                    imageView.setLayoutParams(layoutParamsimg);
+                                                    Picasso.with(context).load(imgurl).into(imageView);
 
 
+                                                    CardView cvt = new CardView(context);
+                                                    layoutparams.setMargins(15,15,15,15);
+                                                    cvt.setLayoutParams(layoutParamsimg);
+                                                    cvt.setRadius(5);
+                                                    cvt.setPadding(15, 5, 15, 5);
+                                                    cvt.setCardBackgroundColor(0xFFFFFFCC);
+                                                    cvt.setMaxCardElevation(10);
+                                                    cvt.addView(imageView);
+
+                                                    runOnUiThread(new Runnable() {
+                                                        public void run() {
+                                                            LinearLayoutView.addView(cvi);
+                                                            LinearLayoutView.addView(cvt);
+
+                                                        }
+                                                    });
 
 
+                                                    /*
                                                     //At this point add the image to the present chat window
                                                     ImageView imageView = new ImageView(context);
                                                     imageView.setImageDrawable(Drawable.createFromPath(mCurrentPhotoPath));
@@ -1055,41 +1058,18 @@ if(connection.isConnected())
                                                     cvt.setMaxCardElevation(10);
 
 
-
                                                     cvt.addView(imageView);
-
-
                                                     runOnUiThread(new Runnable() {
                                                         public void run() {
                                                             LinearLayoutView.addView(cvi);
                                                             LinearLayoutView.addView(cvt);
-
                                                         }
                                                     });
-
-
-
-
-
-
-
-
+                                                     */
 
                                                 }//type 3 message from some other sender
-                                                else{
-
-                                                    IndividualChat2.MessageHandlerP mppp=new IndividualChat2.MessageHandlerP();
-
-                                                    mppp.pinsertMessage(message.getBody(),"null",message.getFrom(),"null","yes");
-
-
-
-                                                }
-
 
                                             }//end of type =3
-                                              */
-
 
                                         }//end of valid xml
 
@@ -1142,11 +1122,6 @@ if(connection.isConnected())
 
                                              */
                                         }//end of not a valid xml
-
-
-
-
-
 
 
                                     }//end of process messsage
@@ -1206,7 +1181,6 @@ if(connection.isConnected())
                 dialog.dismiss();
             }
 
-
         }
 
 
@@ -1231,20 +1205,10 @@ if(connection.isConnected())
             MessageHandlerP mp=new MessageHandlerP();
             mp.pinsertMessage(Messagetosend,Currenttime,uname,"null","yes",sender,"two");
 
-
-
-
             String toPerson=sender+"@pchat";
-
-
-
-
-
-
 
             if(connection.isAuthenticated())
             {
-
                 EntityBareJid jid = null;
                 ChatManager chatManager = ChatManager.getInstanceFor(connection);
                 try {
@@ -1259,10 +1223,7 @@ if(connection.isConnected())
                     e.printStackTrace();
                 }
 
-
                 //clear the chat window
-
-
 
                 runOnUiThread(new Runnable(){
                     public void run() {
@@ -1288,19 +1249,19 @@ if(connection.isConnected())
                         cvr.addView(tv);
                         LinearLayoutView.addView(cvr);
 
-
-
                     }
                 });
 
             }//end of received message
 
-
             return null;
         }//end of do in background
 
-
     }//end of inner class
+
+
+
+
 
 
 
@@ -1328,34 +1289,22 @@ if(connection.isConnected())
         }
 
 
-
-
-
         protected Void doInBackground(Void... voids) {
-
 
             String userName=uname;
             String password=pword;
 
-
             if(connection.isAuthenticated())
             {
 
-
                 String toUser="mine@pchat";
                 String description="file transfer check";
-
                 uploadFile();
-
-
-
 
             }//end of received message
 
-
             return null;
         }//end of do in background
-
 
 
 
@@ -1389,9 +1338,6 @@ if(connection.isConnected())
 
             successcode=response.body().string();
 
-
-
-
             } catch (UnknownHostException | UnsupportedEncodingException e) {
                 Log.e( "Error: " , e.getLocalizedMessage());
             } catch (Exception e) {
@@ -1399,13 +1345,13 @@ if(connection.isConnected())
             }
 
 
+            File file2 = new File(mCurrentPhotoPath);
+            String Currenttime=(DateFormat.format("dd-MM-yyyy-hh-mm-ss", new java.util.Date()).toString());
+            Log.d ("Currenttime", Currenttime);
+            String fn=file2.getName();
 
-                File file2 = new File(mCurrentPhotoPath);
-
-                String fn=file2.getName();
                 String uploadedPath="https://www.flarespeech.com/pchat_uploads/"+fn;
-                String PicMessagetoSend="<message><type>three</type><sender>"+uname+"</sender><recepient>"+sender+"</recepient><path>"+uploadedPath+"</path></message>";
-
+                String PicMessagetoSend="<message><type>three</type><sender>"+uname+"</sender><time>"+Currenttime+"</time><recepient>"+sender+"</recepient><content>"+uploadedPath+"</content></message>";
 
                 String toPerson = sender+"@pchat";
                 EntityBareJid jid = null;
@@ -1424,8 +1370,6 @@ if(connection.isConnected())
 
 
 
-
-
             TextView tv=new TextView(context);
             tv.setLayoutParams(layoutparams);
             tv.setText("me:\n");
@@ -1436,7 +1380,7 @@ if(connection.isConnected())
             cvi.setLayoutParams(layoutparams);
             cvi.setRadius(5);
             cvi.setPadding(15, 5, 15, 5);
-            cvi.setCardBackgroundColor(0xFFF8DE7E);
+            cvi.setCardBackgroundColor(0xFFFFFFCC);
             cvi.setMaxCardElevation(10);
 
             cvi.addView(tv);
@@ -1451,18 +1395,13 @@ if(connection.isConnected())
 
 
                 CardView cvt = new CardView(context);
-
                 layoutparams.setMargins(15,15,15,15);
                 cvt.setLayoutParams(layoutParamsimg);
                 cvt.setRadius(5);
                 cvt.setPadding(15, 5, 15, 5);
                 cvt.setCardBackgroundColor(0xFFF8DE7E);
                 cvt.setMaxCardElevation(10);
-
-
-
                 cvt.addView(imageView);
-
 
             runOnUiThread(new Runnable() {
                 public void run() {
@@ -1472,24 +1411,19 @@ if(connection.isConnected())
                 }
             });
 
+            //add the message to db
+            MessageHandlerP mppp=new MessageHandlerP();
 
+            String content=uploadedPath;
+            String time=Currenttime;
+            String fromwhom=uname;
+            String towhom=sender;
 
-
+            mppp.pinsertMessage(content,time, fromwhom,"null","yes",towhom,"three");
 
         }//end of upload
 
-
-
-
-
     }//end of inner class
-
-
-
-
-
-
-
 
 
 
@@ -1601,12 +1535,14 @@ if(connection.isConnected())
 
 
 
-    private void downloadImage(@NonNull String url) throws IOException {
+    String  downloadImage(@NonNull String url) throws IOException {
 
         String imageFileName="sample";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName,   ".jpg",     storageDir );
 
+
+        Log.d("image directory", ImageDownloadedPath);
 
         Request request = new Request.Builder().url(url).build();
         new OkHttpClient().newCall(request).enqueue(new Callback() {@Override
@@ -1626,6 +1562,7 @@ if(connection.isConnected())
             }
         });
 
+        return  image.getAbsolutePath();
     }
 
 

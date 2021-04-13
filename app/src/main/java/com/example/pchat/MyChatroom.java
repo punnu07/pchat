@@ -206,12 +206,9 @@ public class MyChatroom extends AppCompatActivity {
 */
 
 
-
     private class  joinChat extends AsyncTask<Void, Void, Void> {
 
-
         final ProgressDialog dialog = new ProgressDialog(context);
-
 
 
         protected void onPreExecute() {
@@ -236,7 +233,6 @@ public class MyChatroom extends AppCompatActivity {
 
 
         protected Void doInBackground(Void... voids) {
-
 
 
             //join as the second person
@@ -273,14 +269,10 @@ public class MyChatroom extends AppCompatActivity {
             final TextView[] tv = new TextView[1];
 
 
-
-
             MyChatroom.MessageHandler mh=new MyChatroom.MessageHandler();
             //already connected
             if(connection.isAuthenticated())
             {
-
-
 
                 EntityBareJid mucJid = null;
                 MultiUserChat muc = null;
@@ -307,8 +299,6 @@ public class MyChatroom extends AppCompatActivity {
                 Log.d("history", String.valueOf(history));
 
 
-
-
                 runOnUiThread(new Runnable(){
                     public void run() {
 
@@ -317,7 +307,6 @@ public class MyChatroom extends AppCompatActivity {
 
                     }
                 });
-
 
                 muc.addMessageListener(new MessageListener() {
                     public void processMessage(Message message) {

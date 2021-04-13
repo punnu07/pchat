@@ -262,8 +262,6 @@ public class MyGroups extends AppCompatActivity {
                         intent.putExtra(EXTRA_PWD, pword);
                         intent.putExtra(EXTRA_NAME, uname);
 
-
-
                         if(user.equals(uname)) {
                             intent.putExtra(EXTRA_SENDER, recList.get(finalI));
                         }
@@ -272,17 +270,13 @@ public class MyGroups extends AppCompatActivity {
                             intent.putExtra(EXTRA_SENDER, user);
                         }
 
-
                         startActivity(intent);
-
 
                     }
                 });
 
                 //cv[i].addView(textview);
-
                 cvv.setClickable(true);
-
                 LinearLayoutView.addView(cvv);
             }
 
@@ -523,30 +517,28 @@ public class MyGroups extends AppCompatActivity {
 
                                                         String content = doc.getElementsByTagName("content").item(0).getTextContent();
                                                         String time =  doc.getElementsByTagName("time").item(0).getTextContent();
-
                                                         String sender =  doc.getElementsByTagName("sender").item(0).getTextContent();
-
-
                                                         MessageHandlerG mggg=new MessageHandlerG();
                                                         mggg.ginsertMessage(content,time, sender,"null","yes",uname,"two");
-
 
                                                     }
 
 
 
-                                                    /*
-
                                                     if(type.equals("three"))
                                                     {
 
-                                                        MessageHandlerG mgg=new MessageHandlerG();
-                                                        mgg.ginsertMessage(message.getBody(),"null", message.getFrom().toString(),"null","yes");
+                                                        String content = doc.getElementsByTagName("content").item(0).getTextContent();
+                                                        String time =  doc.getElementsByTagName("time").item(0).getTextContent();
+                                                        String sender =  doc.getElementsByTagName("sender").item(0).getTextContent();
+
+                                                        MessageHandlerG mggg=new MessageHandlerG();
+                                                        mggg.ginsertMessage(content,time, sender,"null","yes",uname,"three");
 
 
                                                     }//end of type =3
 
-                                                       */
+
 
 
                                                 }//end of valid xml
