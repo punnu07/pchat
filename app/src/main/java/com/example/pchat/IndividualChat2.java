@@ -138,10 +138,7 @@ public class IndividualChat2 extends AppCompatActivity {
     CardView cardview,cardview2;
     LinearLayout.LayoutParams layoutparams,layoutparams2,layoutParamsimg;
 
-    RelativeLayout.LayoutParams rlayoutparams,rlayoutparams2,rlayoutparams3, rlayoutparams4, rlayoutparams5,rlayoutparams6;
-    TextView textview,textview2;
-
-    EditText MessageToSend;
+    RelativeLayout.LayoutParams rlayoutparams,rlayoutparams2,rlayoutparams3, rlayoutparams4, rlayoutparams5,rlayoutparams6,rlayoutparams7;
 
     LinearLayout LinearLayoutView, LinearLayoutViewBig;
 
@@ -286,6 +283,8 @@ public class IndividualChat2 extends AppCompatActivity {
 
         rlayoutparams6=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
 
+
+        rlayoutparams7=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
 
         //rlayoutparams2.setLayoutDirection(LinearLayout.HORIZONTAL);
 
@@ -481,7 +480,7 @@ public class IndividualChat2 extends AppCompatActivity {
                             }
 
                             if(senderList.get(i).equals(sender)) {
-                                tv.setText("me:\n");
+                                tv.setText(sender+":\n");
                             }
 
 
@@ -544,8 +543,8 @@ public class IndividualChat2 extends AppCompatActivity {
 
 
         sv.addView(LinearLayoutView);
-         sv.setLayoutParams(layoutparams2);
-         sv.setId(101010);
+        sv.setLayoutParams(layoutparams2);
+        sv.setId(101010);
 
         rlayoutView.addView(sv);
 
@@ -629,17 +628,30 @@ public class IndividualChat2 extends AppCompatActivity {
         rlayoutparams5.addRule(RelativeLayout.BELOW,505050);
         takepic_button.setLayoutParams(rlayoutparams5);
         takepic_button.setText("pic");
-        //takepic_button.setBackgroundColor(0xFF6EA470);
         takepic_button.setTextColor(Color.WHITE);
         LinearLayoutViewBig.addView(takepic_button);
 
 
 
 
+        Button takevideo_button=new Button(context);
+        takevideo_button.setId(050505);
+        rlayoutparams7.addRule(RelativeLayout.BELOW,606060);
+        takevideo_button.setLayoutParams(rlayoutparams7);
+        takevideo_button.setText("video");
+        takevideo_button.setTextColor(Color.WHITE);
+        LinearLayoutViewBig.addView(takevideo_button);
+
+
+
+
         rlayoutparams4.addRule(RelativeLayout.ABOVE,606060);
+        rlayoutparams7.addRule(RelativeLayout.BELOW,505050);
 
         cvvv.addView(LinearLayoutViewBig);
         rlayoutView.addView(cvvv);
+
+
 
 
         setContentView(rlayoutView);
@@ -702,8 +714,6 @@ public class IndividualChat2 extends AppCompatActivity {
         });
 
 
-
-
     }//end of oncreate
 
 
@@ -711,16 +721,13 @@ public class IndividualChat2 extends AppCompatActivity {
     protected void onDestroy(){
         super.onDestroy();
 
-if(connection.isConnected())
-{
-    connection.disconnect();
-}
-
+        if(connection.isConnected())
+        {
+                connection.disconnect();
+        }
 
         uname="";
         pword="";
-
-
         finish();
     }//end
 
@@ -760,10 +767,7 @@ if(connection.isConnected())
 
             }
 
-
             new IndividualChat2.FileUpload().execute();
-
-
 
         }
     }
@@ -952,7 +956,8 @@ if(connection.isConnected())
                                                     {
                                                         tv.setTextSize(6);
                                                         tv.setTextColor(Color.GRAY);
-                                                        int spaceslen=content.length();                                                        tv.append("\n");
+                                                        int spaceslen=content.length();
+                                                        tv.append("\n");
                                                         for(int r=0;r<spaceslen;r++) {
                                                             tv.append("\t");
                                                         }
@@ -1253,6 +1258,41 @@ if(connection.isConnected())
                 });
 
             }//end of received message
+            else {
+
+                if (Build.VERSION.SDK_INT >= 11) {
+
+                    runOnUiThread(new Runnable(){
+                        public void run()
+                        {
+                            recreate();
+                        }
+
+                    });
+
+                } else {
+
+
+
+                    Intent intent = getIntent();
+
+                    intent.putExtra(EXTRA_PWD, pword);
+                    intent.putExtra(EXTRA_NAME, uname);
+                    intent.putExtra(EXTRA_SENDER,sender);
+
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    finish();
+                    overridePendingTransition(0, 0);
+
+                    startActivity(intent);
+                    overridePendingTransition(0, 0);
+                }
+
+
+
+
+
+            }
 
             return null;
         }//end of do in background
@@ -1301,7 +1341,43 @@ if(connection.isConnected())
                 String description="file transfer check";
                 uploadFile();
 
-            }//end of received message
+            }
+            else
+            {
+                if (Build.VERSION.SDK_INT >= 11) {
+
+                    runOnUiThread(new Runnable(){
+                        public void run()
+                        {
+                            recreate();
+                        }
+
+                    });
+
+                } else {
+
+
+
+                    Intent intent = getIntent();
+
+                    intent.putExtra(EXTRA_PWD, pword);
+                    intent.putExtra(EXTRA_NAME, uname);
+                    intent.putExtra(EXTRA_SENDER,sender);
+
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    finish();
+                    overridePendingTransition(0, 0);
+
+                    startActivity(intent);
+                    overridePendingTransition(0, 0);
+                }
+
+
+
+
+
+                //end of received message
+            }
 
             return null;
         }//end of do in background
