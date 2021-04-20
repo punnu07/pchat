@@ -1,10 +1,10 @@
-    package com.example.pchat;
-
+   package com.example.pchat;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.FileProvider;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +30,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
@@ -134,6 +135,7 @@ public class MyChatroom extends AppCompatActivity {
 
 
 
+    @SuppressLint("ResourceType")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -176,20 +178,20 @@ public class MyChatroom extends AppCompatActivity {
         rlayoutparams=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
         rlayoutparams2=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
         rlayoutparams3=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
-        rlayoutparams4=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
-        rlayoutparams5=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+        rlayoutparams4=new RelativeLayout.LayoutParams(3*screenWidth/30,50);
+        rlayoutparams5=new RelativeLayout.LayoutParams(3*screenWidth/30,50);
         rlayoutparams6=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
 
-        rlayoutparams7=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+        rlayoutparams7=new RelativeLayout.LayoutParams(3*screenWidth/30,50);
 
 
 
         LinearLayoutViewBig = new LinearLayout(this);
-        LinearLayoutViewBig.setOrientation(LinearLayout.VERTICAL);
+        LinearLayoutViewBig.setOrientation(LinearLayout.HORIZONTAL);
 
         sv.addView(LinearLayoutView);
 
-        layoutparams2.height=7*screenHeight/10;
+        layoutparams2.height=8*screenHeight/10;
         sv.setLayoutParams(layoutparams2);
         sv.setId(787878);
         rlayoutView.addView(sv);
@@ -246,51 +248,56 @@ public class MyChatroom extends AppCompatActivity {
         cvvv.setId(565656);
 
 
-        rlayoutparams6.setLayoutDirection(LinearLayout.VERTICAL);
+       // rlayoutparams6.setLayoutDirection(LinearLayout.HORIZONTAL);
         rlayoutparams6.addRule(RelativeLayout.RIGHT_OF,898989);
         rlayoutparams6.addRule(RelativeLayout.BELOW,787878);
+
         rlayoutparams6.height=2*screenHeight/10;
+        rlayoutparams6.width=3*screenWidth/10;
+        rlayoutparams6.setMargins(1,5,10,15);
+
 
         cvvv.setLayoutParams(rlayoutparams6);
 
 
-        Button individualmessagesend_button=new Button(context);
-        individualmessagesend_button.setId(454545);
-        individualmessagesend_button.setText("TeXT");
 
-        individualmessagesend_button.setBackgroundColor(Color.WHITE);
-        individualmessagesend_button.setTextColor(0xff6ea470);
 
+
+
+
+        ImageButton  individualmessagesend_button= new ImageButton(this);
+        individualmessagesend_button.setImageResource(R.drawable.messenger);
         individualmessagesend_button.setLayoutParams(rlayoutparams4);
+        individualmessagesend_button.setScaleType(ImageView.ScaleType.CENTER);
+        //individualmessagesend_button.setAdjustViewBounds(true);
+        individualmessagesend_button.setBackgroundColor(Color.TRANSPARENT);
+        individualmessagesend_button.setId(454545);
         LinearLayoutViewBig.addView(individualmessagesend_button);
 
 
 
-        Button takepic_button=new Button(context);
-        takepic_button.setId(343434);
-        rlayoutparams5.addRule(RelativeLayout.BELOW,454545);
+
+        ImageButton  takepic_button= new ImageButton(this);
+        takepic_button.setImageResource(R.drawable.camera);
         takepic_button.setLayoutParams(rlayoutparams5);
-        takepic_button.setText("pic");
-        takepic_button.setBackgroundColor(Color.WHITE);
-        takepic_button.setTextColor(0xff6ea470);
+        takepic_button.setScaleType(ImageView.ScaleType.CENTER);
+        takepic_button.setBackgroundColor(Color.TRANSPARENT);
+        takepic_button.setId(343434);
         LinearLayoutViewBig.addView(takepic_button);
 
 
-
-
-        Button takevideo_button=new Button(context);
-        takevideo_button.setId(545454);
-        rlayoutparams7.addRule(RelativeLayout.BELOW,606060);
+        ImageButton  takevideo_button= new ImageButton(this);
+        takevideo_button.setImageResource(R.drawable.video);
         takevideo_button.setLayoutParams(rlayoutparams7);
-        takevideo_button.setText("video");
-        takevideo_button.setBackgroundColor(Color.WHITE);
-        takevideo_button.setTextColor(0xff6ea470);
-
+        takevideo_button.setScaleType(ImageView.ScaleType.CENTER);
+        takevideo_button.setBackgroundColor(Color.TRANSPARENT);
+        takevideo_button.setId(545454);
         LinearLayoutViewBig.addView(takevideo_button);
 
 
-        rlayoutparams4.addRule(RelativeLayout.ABOVE,343434);
-        rlayoutparams7.addRule(RelativeLayout.BELOW,343434);
+
+        rlayoutparams4.addRule(RelativeLayout.LEFT_OF,343434);
+        rlayoutparams7.addRule(RelativeLayout.RIGHT_OF,343434);
 
         cvvv.addView(LinearLayoutViewBig);
 
@@ -304,7 +311,7 @@ public class MyChatroom extends AppCompatActivity {
 
 
         //send message handler
-        Button sendChat_button= findViewById(454545);
+        ImageButton sendChat_button= findViewById(454545);
         sendChat_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
 
@@ -339,7 +346,7 @@ public class MyChatroom extends AppCompatActivity {
          */
 
 
-        Button picuploadbutton=findViewById(343434);
+        ImageButton picuploadbutton=findViewById(343434);
         picuploadbutton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             public void onClick(View v) {
@@ -376,7 +383,7 @@ public class MyChatroom extends AppCompatActivity {
 
 
         //send message handler
-        Button sendvideo_button= findViewById(545454);
+        ImageButton sendvideo_button= findViewById(545454);
         sendvideo_button.setOnClickListener(new View.OnClickListener(){
             @RequiresApi(api = Build.VERSION_CODES.N)
             public void onClick(View v){
@@ -709,7 +716,7 @@ public class MyChatroom extends AppCompatActivity {
 
 
                             MyChatroom.MessageHandler mh=new MyChatroom.MessageHandler();
-                            mh.insertMessage(message.getBody(),"null",message.getFrom().toString(),"null","no","","two");
+                            mh.insertMessage(message.getBody(),time,message.getFrom().toString(),"null","no","","two");
 
                             //receiver is uname
                             //first inserrt the message into the db
@@ -858,27 +865,17 @@ public class MyChatroom extends AppCompatActivity {
                                 }
                             });
 
-
-
-
                         }//end of type 3
 
 
                         if(type.equals("four")) {
 
-
                             String content = doc.getElementsByTagName("content").item(0).getTextContent();
                             String time = doc.getElementsByTagName("time").item(0).getTextContent();
 
                             String fromwhom = doc.getElementsByTagName("sender").item(0).getTextContent();
-
-
                             String[] nowtime = (DateFormat.format("dd-MM-yyyy-hh-mm-ss", new java.util.Date()).toString()).split("-");
                             int todaydate = Integer.valueOf(nowtime[0]);
-
-
-
-
 
 
                             TextView tv=new TextView(context);
@@ -1053,10 +1050,7 @@ public class MyChatroom extends AppCompatActivity {
                                      }
                                  });
 
-
-
                              }
-
 
                         }//end of type 4
 
@@ -1073,6 +1067,9 @@ public class MyChatroom extends AppCompatActivity {
 
 
     }//end of inner class
+
+
+
 
 
 
@@ -1132,7 +1129,7 @@ public class MyChatroom extends AppCompatActivity {
             MyChatroom.MessageHandler mh=new MyChatroom.MessageHandler();
 
             //already connected
-            if(connection.isAuthenticated())
+            if(connection.isConnected())
             {
 
                EntityBareJid mucJid = null;
@@ -1175,8 +1172,6 @@ public class MyChatroom extends AppCompatActivity {
                 });
 
 
-
-
             }//end of connection
             else
             {
@@ -1197,20 +1192,10 @@ public class MyChatroom extends AppCompatActivity {
                   intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                   finish();
                   overridePendingTransition(0, 0);
-
                   startActivity(intent);
                   overridePendingTransition(0, 0);
 
-
-
-
-
-
-
             }
-
-            //disconnect the connection
-            // connection2.disconnect();
 
             return null;
         }//end of do in background
@@ -1250,7 +1235,7 @@ public class MyChatroom extends AppCompatActivity {
             String userName=uname;
             String password=pword;
 
-            if(connection.isAuthenticated())
+            if(connection.isConnected())
             {
 
                 uploadFile();
@@ -1329,7 +1314,7 @@ public class MyChatroom extends AppCompatActivity {
             String PicMessagetoSend="<message><type>three</type><sender>"+uname+"</sender><time>"+Currenttime+"</time><recepient>"+roomname+"</recepient><content>"+uploadedPath+"</content></message>";
 
 
-            if(connection.isAuthenticated()) {
+            if(connection.isConnected()) {
                 EntityBareJid mucJid = null;
                 MultiUserChat muc = null;
                 MultiUserChatManager manager = null;
@@ -1445,7 +1430,7 @@ public class MyChatroom extends AppCompatActivity {
             String userName=uname;
             String password=pword;
 
-            if(connection.isAuthenticated())
+            if(connection.isConnected())
             {
 
                 uploadFile();
@@ -1521,7 +1506,7 @@ public class MyChatroom extends AppCompatActivity {
             String PicMessagetoSend="<message><type>four</type><sender>"+uname+"</sender><time>"+Currenttime+"</time><recepient>"+roomname+"</recepient><content>"+uploadedPath+"</content></message>";
 
 
-            if(connection.isAuthenticated()) {
+            if(connection.isConnected()) {
                 EntityBareJid mucJid = null;
                 MultiUserChat muc = null;
                 MultiUserChatManager manager = null;

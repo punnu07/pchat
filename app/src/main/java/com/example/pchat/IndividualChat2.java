@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import androidx.core.content.FileProvider;
 
 
 import org.jivesoftware.smack.ReconnectionManager;
+import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import android.app.ProgressDialog;
@@ -36,12 +38,14 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.squareup.picasso.Picasso;
 
@@ -61,6 +65,9 @@ import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
+import org.jivesoftware.smackx.muc.DiscussionHistory;
+import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.muc.MultiUserChatManager;
 import org.jivesoftware.smackx.ping.PingManager;
 import org.jivesoftware.smackx.ping.android.ServerPingWithAlarmManager;
 import org.json.JSONObject;
@@ -72,10 +79,17 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -111,6 +125,7 @@ public class IndividualChat2 extends AppCompatActivity {
     public static final String EXTRA_PWD = "b";
     public static final String EXTRA_SENDER = "c";
 
+    public int MAX_STANZAS= 200000;
 
     final Context context = this;
 
@@ -131,12 +146,17 @@ public class IndividualChat2 extends AppCompatActivity {
     private String mCurrentPhotoPath;
     private ImageView mImageView;
 
+    private String mCurrentVideoPath;
+
+    private static final int VIDEO_CAPTURE = 101;
+    Uri videoUri;
+
 
     private String ImageDownloadedPath="";
 
 
     CardView cardview,cardview2;
-    LinearLayout.LayoutParams layoutparams,layoutparams2,layoutParamsimg;
+    LinearLayout.LayoutParams layoutparams,layoutparams2,layoutParamsimg,layoutParamsvideo;
 
     RelativeLayout.LayoutParams rlayoutparams,rlayoutparams2,rlayoutparams3, rlayoutparams4, rlayoutparams5,rlayoutparams6,rlayoutparams7;
 
@@ -160,6 +180,18 @@ public class IndividualChat2 extends AppCompatActivity {
         pword=getIntent().getStringExtra(IndividualChat2.EXTRA_PWD);
         sender=getIntent().getStringExtra(IndividualChat2.EXTRA_SENDER);
 
+        Display display = getWindowManager().getDefaultDisplay();
+        int screenWidth = display.getWidth();
+        int screenHeight = display.getHeight();
+
+
+        layoutparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT );
+        layoutparams2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT );
+        layoutParamsimg=new LinearLayout.LayoutParams(screenWidth/2, screenWidth/2 );
+        layoutParamsvideo=new LinearLayout.LayoutParams(8*screenWidth/10, 8*screenWidth/10 );
+
+
+
         IndividualChat2.MessageHandlerP mp=new IndividualChat2.MessageHandlerP();
 
         ArrayList <String> senderList=mp.pgetAllSender();
@@ -175,6 +207,8 @@ public class IndividualChat2 extends AppCompatActivity {
         Collections.sort(ti, new Comparator<timeIndex>() {
             @Override
             public int compare(timeIndex o1, timeIndex o2) {
+            Log.d("time1",o1.time);
+                Log.d("time2",o2.time);
 
                 String date1=o1.time;
                 String date2=o2.time;
@@ -271,36 +305,29 @@ public class IndividualChat2 extends AppCompatActivity {
 
 
         RelativeLayout rlayoutView = new RelativeLayout(this);
+
         rlayoutparams=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
-
         rlayoutparams2=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
-
         rlayoutparams3=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
-
-        rlayoutparams4=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
-
-        rlayoutparams5=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
-
+        rlayoutparams4=new RelativeLayout.LayoutParams(3*screenWidth/30,50);
+        rlayoutparams5=new RelativeLayout.LayoutParams(3*screenWidth/30,50);
         rlayoutparams6=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
 
+        rlayoutparams7=new RelativeLayout.LayoutParams(3*screenWidth/30,50);
 
-        rlayoutparams7=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+
+
 
         //rlayoutparams2.setLayoutDirection(LinearLayout.HORIZONTAL);
 
 
 
 
-        Display display = getWindowManager().getDefaultDisplay();
-        int screenWidth = display.getWidth();
-        int screenHeight = display.getHeight();
 
 
 
 
-        layoutparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT );
-        layoutparams2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT );
-        layoutParamsimg=new LinearLayout.LayoutParams(screenWidth/2, screenWidth/2 );
 
         sv=new ScrollView(context);
 
@@ -308,7 +335,7 @@ public class IndividualChat2 extends AppCompatActivity {
         LinearLayoutView.setOrientation(LinearLayout.VERTICAL);
 
         LinearLayoutViewBig = new LinearLayout(this);
-        LinearLayoutViewBig.setOrientation(LinearLayout.VERTICAL);
+        LinearLayoutViewBig.setOrientation(LinearLayout.HORIZONTAL);
 
         int num_messages_to_display=0;
         String sendername;
@@ -526,8 +553,185 @@ public class IndividualChat2 extends AppCompatActivity {
                             });
 
                     }//end of type 3
+             if(type.equals("four")) {
 
-            }//end of relevant message between sender and uname
+
+                 TextView tv = new TextView(context);
+                 tv.setLayoutParams(layoutparams);
+
+
+                 if (senderList.get(i).equals(uname)) {
+                     tv.setText("me:\n");
+                 } else {
+                     tv.setText(sender + ":\n");
+                 }
+
+
+                 CardView cvi = new CardView(context);
+                 layoutparams.setMargins(15, 15, 15, 15);
+                 cvi.setLayoutParams(layoutparams);
+                 cvi.setRadius(5);
+                 cvi.setPadding(15, 5, 15, 5);
+                 cvi.setCardBackgroundColor(0xFFFFFFCC);
+                 cvi.setMaxCardElevation(10);
+
+                 cvi.addView(tv);
+
+
+                 //At this point add the video to the present chat window
+                 //firs check wheether the video is donwloaded or not
+
+                 //get the file name exact from the url
+
+                 String content=messageList.get(i);
+
+                 String[] fn = content.split("/");
+                 String filename = fn[fn.length - 1];
+                 Log.d("fn", filename);
+
+                 File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
+                 boolean filepresent = false;
+
+                 File[] files = storageDir.listFiles();
+                 for (int y = 0; y < files.length; y++) {
+                     if (filename.equals(files[y].getName())) {
+                         filepresent = true;
+                         break;
+                     }
+                 }
+
+
+                 Log.d("file present", String.valueOf(filepresent));
+
+                 String destinationfilename = storageDir.getAbsolutePath() + "/" + filename;
+
+                 if (filepresent == false) {
+
+
+                     URL u = null;
+                     try {
+                         u = new URL(content);
+                     } catch (MalformedURLException e) {
+                         e.printStackTrace();
+                     }
+                     URLConnection conn = null;
+                     try {
+                         conn = u.openConnection();
+                     } catch (IOException e) {
+                         e.printStackTrace();
+                     }
+                     int contentLength = conn.getContentLength();
+
+                     DataInputStream stream = null;
+                     try {
+                         stream = new DataInputStream(u.openStream());
+                     } catch (IOException e) {
+                         e.printStackTrace();
+                     }
+
+                     byte[] buffer = new byte[contentLength];
+                     try {
+                         stream.readFully(buffer);
+                     } catch (IOException e) {
+                         e.printStackTrace();
+                     }
+                     try {
+                         stream.close();
+                     } catch (IOException e) {
+                         e.printStackTrace();
+                     }
+
+                     DataOutputStream fos = null;
+                     try {
+                         fos = new DataOutputStream(new FileOutputStream(destinationfilename));
+                     } catch (FileNotFoundException e) {
+                         e.printStackTrace();
+                     }
+                     try {
+                         fos.write(buffer);
+                     } catch (IOException e) {
+                         e.printStackTrace();
+                     }
+                     try {
+                         fos.flush();
+                     } catch (IOException e) {
+                         e.printStackTrace();
+                     }
+                     try {
+                         fos.close();
+                     } catch (IOException e) {
+                         e.printStackTrace();
+                     }
+
+
+                     VideoView videoview = new VideoView(context);
+                     videoview.setLayoutParams(layoutParamsvideo);
+                     videoview.setVideoURI(Uri.parse(content)); //the string of the URL mentioned above
+                     videoview.requestFocus();
+
+                     runOnUiThread(new Runnable() {
+                         public void run() {
+                             videoview.start();
+                         }
+                     });
+
+                     CardView cvt = new CardView(context);
+                     layoutparams.setMargins(15, 15, 15, 15);
+                     cvt.setLayoutParams(layoutparams);
+                     cvt.setRadius(5);
+                     cvt.setPadding(15, 5, 15, 5);
+                     cvt.setCardBackgroundColor(0xFFFFFFCC);
+                     cvt.setMaxCardElevation(10);
+                     cvt.addView(videoview);
+
+                     runOnUiThread(new Runnable() {
+                         public void run() {
+                             LinearLayoutView.addView(cvi);
+                             LinearLayoutView.addView(cvt);
+
+                         }
+                     });
+
+                 } else {
+
+                     VideoView videoview = new VideoView(context);
+                     videoview.setLayoutParams(layoutParamsvideo);
+                     videoview.setVideoURI(Uri.parse(destinationfilename)); //the string of the URL mentioned above
+                     videoview.requestFocus();
+
+                     runOnUiThread(new Runnable() {
+                         public void run() {
+                             videoview.start();
+                         }
+                     });
+                     CardView cvt = new CardView(context);
+                     layoutparams.setMargins(15, 15, 15, 15);
+                     cvt.setLayoutParams(layoutparams);
+                     cvt.setRadius(5);
+                     cvt.setPadding(15, 5, 15, 5);
+                     cvt.setCardBackgroundColor(0xFFFFFFCC);
+                     cvt.setMaxCardElevation(10);
+                     cvt.addView(videoview);
+
+                     runOnUiThread(new Runnable() {
+                         public void run() {
+                             LinearLayoutView.addView(cvi);
+                             LinearLayoutView.addView(cvt);
+
+                         }
+                     });
+
+
+                 }
+
+
+             }//end of type=four
+
+
+
+
+             }//end of relevant message between sender and uname
 
 
         }//end of messages
@@ -606,6 +810,9 @@ public class IndividualChat2 extends AppCompatActivity {
         rlayoutparams6.addRule(RelativeLayout.RIGHT_OF,202020);
         rlayoutparams6.addRule(RelativeLayout.BELOW,101010);
         rlayoutparams6.height=2*screenHeight/10;
+        rlayoutparams6.width=3*screenWidth/10;
+        rlayoutparams6.setMargins(1,5,10,15);
+
 
         cvvv.setLayoutParams(rlayoutparams6);
 
@@ -613,45 +820,52 @@ public class IndividualChat2 extends AppCompatActivity {
 
 
 
-        Button individualmessagesend_button=new Button(context);
-        individualmessagesend_button.setId(505050);
-        individualmessagesend_button.setText("Send");
-        //individualmessagesend_button.setBackgroundColor(0xFF6EA470);
-        individualmessagesend_button.setTextColor(Color.WHITE);
+
+
+
+        ImageButton individualmessagesend_button= new ImageButton(this);
+        individualmessagesend_button.setImageResource(R.drawable.messenger);
         individualmessagesend_button.setLayoutParams(rlayoutparams4);
+        individualmessagesend_button.setScaleType(ImageView.ScaleType.CENTER);
+        //individualmessagesend_button.setAdjustViewBounds(true);
+        individualmessagesend_button.setBackgroundColor(Color.TRANSPARENT);
+        individualmessagesend_button.setId(505050);
         LinearLayoutViewBig.addView(individualmessagesend_button);
 
 
 
-        Button takepic_button=new Button(context);
-        takepic_button.setId(606060);
-        rlayoutparams5.addRule(RelativeLayout.BELOW,505050);
+
+        ImageButton  takepic_button= new ImageButton(this);
+        takepic_button.setImageResource(R.drawable.camera);
         takepic_button.setLayoutParams(rlayoutparams5);
-        takepic_button.setText("pic");
-        takepic_button.setTextColor(Color.WHITE);
+        takepic_button.setScaleType(ImageView.ScaleType.CENTER);
+        takepic_button.setBackgroundColor(Color.TRANSPARENT);
+        takepic_button.setId(606060);
         LinearLayoutViewBig.addView(takepic_button);
 
 
-
-
-        Button takevideo_button=new Button(context);
-        takevideo_button.setId(050505);
-        rlayoutparams7.addRule(RelativeLayout.BELOW,606060);
+        ImageButton  takevideo_button= new ImageButton(this);
+        takevideo_button.setImageResource(R.drawable.video);
         takevideo_button.setLayoutParams(rlayoutparams7);
-        takevideo_button.setText("video");
-        takevideo_button.setTextColor(Color.WHITE);
+        takevideo_button.setScaleType(ImageView.ScaleType.CENTER);
+        takevideo_button.setBackgroundColor(Color.TRANSPARENT);
+        takevideo_button.setId(050505);
         LinearLayoutViewBig.addView(takevideo_button);
 
 
 
 
-        rlayoutparams4.addRule(RelativeLayout.ABOVE,606060);
-        rlayoutparams7.addRule(RelativeLayout.BELOW,505050);
+
+        rlayoutparams4.addRule(RelativeLayout.LEFT_OF,606060);
+        rlayoutparams7.addRule(RelativeLayout.RIGHT_OF,606060);
+
+
+
+
+
 
         cvvv.addView(LinearLayoutViewBig);
         rlayoutView.addView(cvvv);
-
-
 
 
         setContentView(rlayoutView);
@@ -666,7 +880,7 @@ public class IndividualChat2 extends AppCompatActivity {
 
 
 //event handler for message send button
-        Button privatemessagesendbutton=findViewById(505050);
+        ImageButton privatemessagesendbutton=findViewById(505050);
         privatemessagesendbutton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
@@ -680,7 +894,7 @@ public class IndividualChat2 extends AppCompatActivity {
 
 
 //event handler for picture upload button
-        Button picuploadbutton=findViewById(606060);
+        ImageButton picuploadbutton=findViewById(606060);
         picuploadbutton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             public void onClick(View v) {
@@ -714,6 +928,30 @@ public class IndividualChat2 extends AppCompatActivity {
         });
 
 
+
+
+
+
+
+        //send video handler
+        ImageButton sendvideo_button= findViewById(050505);
+        sendvideo_button.setOnClickListener(new View.OnClickListener(){
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            public void onClick(View v){
+
+                try {
+                    startRecordingVideo();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+
+
+
+
     }//end of oncreate
 
 
@@ -730,6 +968,38 @@ public class IndividualChat2 extends AppCompatActivity {
         pword="";
         finish();
     }//end
+
+
+
+
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void startRecordingVideo() throws IOException {
+        if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)) {
+            Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String videoFileName = "MP4_" + timeStamp + "_";
+            File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            File videofile = File.createTempFile(videoFileName,   ".mp4",     storageDir );
+
+            Uri videoUri = FileProvider.getUriForFile(context,"com.example.pchat.fileprovider" , videofile);
+
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
+            mCurrentVideoPath=videofile.getAbsolutePath();
+            startActivityForResult(intent, VIDEO_CAPTURE);
+        } else {
+            Toast.makeText(this, "No camera on device", Toast.LENGTH_LONG).show();
+        }
+    }
+
+
+
+
+
+
+
+
 
 
 
@@ -752,13 +1022,12 @@ public class IndividualChat2 extends AppCompatActivity {
     }
 
 
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-
-            //Bundle extras = data.getExtras();
-            //Bitmap imageBitmap = (Bitmap) extras.get("data");
 
             try {
                 mImageBitmap=  MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(mCurrentPhotoPath));
@@ -770,7 +1039,28 @@ public class IndividualChat2 extends AppCompatActivity {
             new IndividualChat2.FileUpload().execute();
 
         }
+
+
+        //for video capture
+        if (requestCode == VIDEO_CAPTURE) {
+            if (resultCode == RESULT_OK) {
+                //Toast.makeText(this, "\n" + data.getData(), Toast.LENGTH_LONG).show();
+                // playbackRecordedVideo();
+
+                new IndividualChat2.VideoFileUpload().execute();
+
+
+            } else if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "Video recording cancelled.",  Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Failed to record video",  Toast.LENGTH_LONG).show();
+            }
+        }
+
+
+
     }
+
 
 
 
@@ -857,9 +1147,6 @@ public class IndividualChat2 extends AppCompatActivity {
 
                                         Log.d("message received", message.getBody());
                                         //check whether incoming message is an xml type format
-                                        int valid_xml=CheckforXML(message.getBody());
-                                        if(valid_xml==1)
-                                        {
 
                                             //this could be a roster message for group invitation or an individual message
                                             //for image
@@ -1046,87 +1333,199 @@ public class IndividualChat2 extends AppCompatActivity {
                                                     });
 
 
-                                                    /*
-                                                    //At this point add the image to the present chat window
-                                                    ImageView imageView = new ImageView(context);
-                                                    imageView.setImageDrawable(Drawable.createFromPath(mCurrentPhotoPath));
-                                                    imageView.setLayoutParams(layoutParamsimg);
-
-
-                                                    CardView cvt = new CardView(context);
-
-                                                    layoutparams.setMargins(15,15,15,15);
-                                                    cvt.setLayoutParams(layoutParamsimg);
-                                                    cvt.setRadius(5);
-                                                    cvt.setPadding(15, 5, 15, 5);
-                                                    cvt.setCardBackgroundColor(0xFFF8DE7E);
-                                                    cvt.setMaxCardElevation(10);
-
-
-                                                    cvt.addView(imageView);
-                                                    runOnUiThread(new Runnable() {
-                                                        public void run() {
-                                                            LinearLayoutView.addView(cvi);
-                                                            LinearLayoutView.addView(cvt);
-                                                        }
-                                                    });
-                                                     */
 
                                                 }//type 3 message from some other sender
 
                                             }//end of type =3
-
-                                        }//end of valid xml
-
-                                        else {
-
-                                            /*
-                                            IndividualChat2.MessageHandlerP mpp = new IndividualChat2.MessageHandlerP();
-                                            String[] sendername = message.getFrom().split("@");
-                                            if (sendername[0].equals(sender)) {//display it in the screen
+                                            if(type.equals("four")) {
 
 
-                                                runOnUiThread(new Runnable() {
-                                                    public void run() {
-                                                        //check whether incoming message is an xml type format
-                                                        //if it is an xml its roster request meant for the admin.
-                                                        //otherwise  store it and display it
-                                                        // tvv.append("\n\n"+sender+":"+message.getBody());
+                                                String content = doc.getElementsByTagName("content").item(0).getTextContent();
+                                                String time = doc.getElementsByTagName("time").item(0).getTextContent();
 
-                                                        mpp.pinsertMessage(message.getBody(), "null", message.getFrom(), "null", "yes");
+                                                String fromwhom = doc.getElementsByTagName("sender").item(0).getTextContent();
 
 
-                                                        CardView crv = new CardView(context);
-
-                                                        layoutparams.setMargins(15, 15, 15, 15);
-                                                        crv.setLayoutParams(layoutparams);
-                                                        crv.setRadius(15);
-                                                        crv.setPadding(15, 5, 15, 5);
-                                                        crv.setCardBackgroundColor(0xFDFDFDFF);
-                                                        crv.setMaxCardElevation(10);
+                                                String[] nowtime = (DateFormat.format("dd-MM-yyyy-hh-mm-ss", new java.util.Date()).toString()).split("-");
+                                                int todaydate = Integer.valueOf(nowtime[0]);
 
 
-                                                        TextView tv = new TextView(context);
-                                                        tv.setLayoutParams(layoutparams);
-                                                        tv.setText(" " + sender + ":" + message.getBody() + "\n");
-
-                                                        crv.addView(tv);
-                                                        LinearLayoutView.addView(crv);
+                                                MessageHandlerP mppp=new MessageHandlerP();
+                                                mppp.pinsertMessage(content,time, fromwhom,"null","yes",uname,"four");
 
 
+
+
+                                                TextView tv = new TextView(context);
+                                                tv.setLayoutParams(layoutparams);
+
+
+                                                if (fromwhom.equals(uname)) {
+                                                    tv.setText("me:\n");
+                                                } else {
+                                                    tv.setText(fromwhom + ":\n");
+                                                }
+
+
+                                                CardView cvi = new CardView(context);
+                                                layoutparams.setMargins(15, 15, 15, 15);
+                                                cvi.setLayoutParams(layoutparams);
+                                                cvi.setRadius(5);
+                                                cvi.setPadding(15, 5, 15, 5);
+                                                cvi.setCardBackgroundColor(0xFFFFFFCC);
+                                                cvi.setMaxCardElevation(10);
+
+                                                cvi.addView(tv);
+
+
+                                                //At this point add the video to the present chat window
+                                                //firs check wheether the video is donwloaded or not
+
+                                                //get the file name exact from the url
+
+                                                String[] fn = content.split("/");
+                                                String filename = fn[fn.length - 1];
+                                                Log.d("fn", filename);
+
+                                                File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
+                                                boolean filepresent = false;
+
+                                                File[] files = storageDir.listFiles();
+                                                for (int i = 0; i < files.length; i++) {
+                                                    if (filename.equals(files[i].getName())) {
+                                                        filepresent = true;
+                                                        break;
+                                                    }
+                                                }
+
+
+                                                Log.d("file present", String.valueOf(filepresent));
+
+                                                String destinationfilename = storageDir.getAbsolutePath() + "/" + filename;
+
+                                                if (filepresent == false) {
+
+
+                                                    URL u = null;
+                                                    try {
+                                                        u = new URL(content);
+                                                    } catch (MalformedURLException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                    URLConnection conn = null;
+                                                    try {
+                                                        conn = u.openConnection();
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                    int contentLength = conn.getContentLength();
+
+                                                    DataInputStream stream = null;
+                                                    try {
+                                                        stream = new DataInputStream(u.openStream());
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
                                                     }
 
-                                                });
+                                                    byte[] buffer = new byte[contentLength];
+                                                    try {
+                                                        stream.readFully(buffer);
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                    try {
+                                                        stream.close();
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                    }
 
-                                            }
-                                            else {//store in db
+                                                    DataOutputStream fos = null;
+                                                    try {
+                                                        fos = new DataOutputStream(new FileOutputStream(destinationfilename));
+                                                    } catch (FileNotFoundException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                    try {
+                                                        fos.write(buffer);
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                    try {
+                                                        fos.flush();
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                    try {
+                                                        fos.close();
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                    }
 
-                                                mpp.pinsertMessage(message.getBody(), "null", message.getFrom(), "null", "yes");
-                                            }
+
+                                                    VideoView videoview = new VideoView(context);
+                                                    videoview.setLayoutParams(layoutParamsvideo);
+                                                    videoview.setVideoURI(Uri.parse(content)); //the string of the URL mentioned above
+                                                    videoview.requestFocus();
+
+                                                    runOnUiThread(new Runnable() {
+                                                        public void run() {
+                                                            videoview.start();
+                                                        }
+                                                    });
+
+                                                    CardView cvt = new CardView(context);
+                                                    layoutparams.setMargins(15, 15, 15, 15);
+                                                    cvt.setLayoutParams(layoutparams);
+                                                    cvt.setRadius(5);
+                                                    cvt.setPadding(15, 5, 15, 5);
+                                                    cvt.setCardBackgroundColor(0xFFFFFFCC);
+                                                    cvt.setMaxCardElevation(10);
+                                                    cvt.addView(videoview);
+
+                                                    runOnUiThread(new Runnable() {
+                                                        public void run() {
+                                                            LinearLayoutView.addView(cvi);
+                                                            LinearLayoutView.addView(cvt);
+
+                                                        }
+                                                    });
+
+                                                } else {
+
+                                                    VideoView videoview = new VideoView(context);
+                                                    videoview.setLayoutParams(layoutParamsvideo);
+                                                    videoview.setVideoURI(Uri.parse(destinationfilename)); //the string of the URL mentioned above
+                                                    videoview.requestFocus();
+
+                                                    runOnUiThread(new Runnable() {
+                                                        public void run() {
+                                                            videoview.start();
+                                                        }
+                                                    });
+                                                    CardView cvt = new CardView(context);
+                                                    layoutparams.setMargins(15, 15, 15, 15);
+                                                    cvt.setLayoutParams(layoutparams);
+                                                    cvt.setRadius(5);
+                                                    cvt.setPadding(15, 5, 15, 5);
+                                                    cvt.setCardBackgroundColor(0xFFFFFFCC);
+                                                    cvt.setMaxCardElevation(10);
+                                                    cvt.addView(videoview);
+
+                                                    runOnUiThread(new Runnable() {
+                                                        public void run() {
+                                                            LinearLayoutView.addView(cvi);
+                                                            LinearLayoutView.addView(cvt);
+
+                                                        }
+                                                    });
 
 
-                                             */
-                                        }//end of not a valid xml
+                                                }
+
+                                            }//end of type="four"
+
+
 
 
                                     }//end of process messsage
@@ -1152,8 +1551,6 @@ public class IndividualChat2 extends AppCompatActivity {
                 return 0;
             }
         }
-
-
 
 
 
@@ -1189,9 +1586,6 @@ public class IndividualChat2 extends AppCompatActivity {
         }
 
 
-
-
-
         protected Void doInBackground(Void... voids) {
 
 
@@ -1212,7 +1606,7 @@ public class IndividualChat2 extends AppCompatActivity {
 
             String toPerson=sender+"@pchat";
 
-            if(connection.isAuthenticated())
+            if(connection.isConnected())
             {
                 EntityBareJid jid = null;
                 ChatManager chatManager = ChatManager.getInstanceFor(connection);
@@ -1249,7 +1643,7 @@ public class IndividualChat2 extends AppCompatActivity {
 
                         TextView tv=new TextView(context);
                         tv.setLayoutParams(layoutparams);
-                        tv.setText("me:"+Messagetosend+"\n");
+                        tv.setText("me: "+Messagetosend+"\n");
 
                         cvr.addView(tv);
                         LinearLayoutView.addView(cvr);
@@ -1260,22 +1654,17 @@ public class IndividualChat2 extends AppCompatActivity {
             }//end of received message
             else {
 
-                if (Build.VERSION.SDK_INT >= 11) {
 
                     runOnUiThread(new Runnable(){
                         public void run()
                         {
-                            recreate();
+                            Toast.makeText(context, "Not Connected.",  Toast.LENGTH_LONG).show();
                         }
 
                     });
 
-                } else {
-
-
 
                     Intent intent = getIntent();
-
                     intent.putExtra(EXTRA_PWD, pword);
                     intent.putExtra(EXTRA_NAME, uname);
                     intent.putExtra(EXTRA_SENDER,sender);
@@ -1286,10 +1675,6 @@ public class IndividualChat2 extends AppCompatActivity {
 
                     startActivity(intent);
                     overridePendingTransition(0, 0);
-                }
-
-
-
 
 
             }
@@ -1302,12 +1687,8 @@ public class IndividualChat2 extends AppCompatActivity {
 
 
 
-
-
-
+    //class for image upload
     private class FileUpload  extends AsyncTask<Void, Void, Void> {
-
-
         String result;
         final ProgressDialog dialog = new ProgressDialog(context);
 
@@ -1344,8 +1725,6 @@ public class IndividualChat2 extends AppCompatActivity {
             }
             else
             {
-                if (Build.VERSION.SDK_INT >= 11) {
-
                     runOnUiThread(new Runnable(){
                         public void run()
                         {
@@ -1353,10 +1732,6 @@ public class IndividualChat2 extends AppCompatActivity {
                         }
 
                     });
-
-                } else {
-
-
 
                     Intent intent = getIntent();
 
@@ -1370,11 +1745,6 @@ public class IndividualChat2 extends AppCompatActivity {
 
                     startActivity(intent);
                     overridePendingTransition(0, 0);
-                }
-
-
-
-
 
                 //end of received message
             }
@@ -1385,13 +1755,6 @@ public class IndividualChat2 extends AppCompatActivity {
 
 
         private void uploadFile() {
-            //progressDialog.show();
-
-            // Map is used to multipart the file using okhttp3.RequestBody
-
-
-            // mCurrentPhotoPath="/storage/emulated/0/Android/data/com.example.pchat/files/Pictures/test.jpg";
-
             File file = new File(mCurrentPhotoPath);
 
             String successcode="";
@@ -1475,7 +1838,7 @@ public class IndividualChat2 extends AppCompatActivity {
                 cvt.setLayoutParams(layoutParamsimg);
                 cvt.setRadius(5);
                 cvt.setPadding(15, 5, 15, 5);
-                cvt.setCardBackgroundColor(0xFFF8DE7E);
+                cvt.setCardBackgroundColor(0xFFFFFFCC);
                 cvt.setMaxCardElevation(10);
                 cvt.addView(imageView);
 
@@ -1496,6 +1859,246 @@ public class IndividualChat2 extends AppCompatActivity {
             String towhom=sender;
 
             mppp.pinsertMessage(content,time, fromwhom,"null","yes",towhom,"three");
+
+        }//end of upload
+
+    }//end of inner class
+
+
+
+
+
+    //inner class for video upload
+    private class VideoFileUpload  extends AsyncTask<Void, Void, Void> {
+
+
+        String result;
+        final ProgressDialog dialog = new ProgressDialog(context);
+
+
+
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.setMessage("Uploading...");
+            dialog.show();
+        }
+
+
+
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        }
+
+
+        protected Void doInBackground(Void... voids) {
+
+            String userName=uname;
+            String password=pword;
+
+            if(connection.isConnected())
+            {
+                uploadFile();
+            }
+            else
+            {
+                runOnUiThread(new Runnable(){
+                    public void run()
+                    {
+                        Toast.makeText(context, "Not Connected.",  Toast.LENGTH_LONG).show();
+                    }
+
+                });
+
+                Intent intent = getIntent();
+                intent.putExtra(EXTRA_PWD, pword);
+                intent.putExtra(EXTRA_NAME, uname);
+                intent.putExtra(EXTRA_SENDER,sender);
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                finish();
+                overridePendingTransition(0, 0);
+
+                startActivity(intent);
+                overridePendingTransition(0, 0);
+
+            }
+
+            return null;
+        }//end of do in background
+
+
+
+        private void uploadFile() {
+
+            File file = new File(mCurrentVideoPath);
+
+            String successcode="";
+
+            try {
+
+                final MediaType MEDIA_TYPE_MP4 = MediaType.parse("video/mp4");
+
+                RequestBody req = new MultipartBody.Builder().setType(MultipartBody.FORM).addFormDataPart("file",file.getName(), RequestBody.create(MEDIA_TYPE_MP4, file)).build();
+
+                Request request = new Request.Builder()
+                        .url("https://www.flarespeech.com/pchat_upload.php")
+                        .post(req)
+                        .build();
+
+                OkHttpClient client = new OkHttpClient();
+                Response response = client.newCall(request).execute();
+
+                Log.d("response", "uploadVideo:"+response.body().string());
+
+                successcode=response.body().string();
+
+            } catch (UnknownHostException | UnsupportedEncodingException e) {
+                Log.e( "Error: " , e.getLocalizedMessage());
+            } catch (Exception e) {
+                Log.e("Other Error: ", e.getLocalizedMessage());
+            }
+
+
+            File file2 = new File(mCurrentVideoPath);
+            String Currenttime=(DateFormat.format("dd-MM-yyyy-hh-mm-ss", new java.util.Date()).toString());
+            Log.d ("Currenttime", Currenttime);
+            String fn=file2.getName();
+
+            String uploadedPath="https://www.flarespeech.com/pchat_uploads/"+fn;
+            String PicMessagetoSend="<message><type>four</type><sender>"+uname+"</sender><time>"+Currenttime+"</time><recepient>"+sender+"</recepient><content>"+uploadedPath+"</content></message>";
+
+
+            if(connection.isConnected()) {
+                EntityBareJid mucJid = null;
+                MultiUserChat muc = null;
+                MultiUserChatManager manager = null;
+
+                manager = MultiUserChatManager.getInstanceFor(connection);
+                muc = manager.getMultiUserChat(sender);
+
+                DiscussionHistory history = new DiscussionHistory();
+                history.setMaxStanzas(MAX_STANZAS);
+
+                try {
+                    muc.join(uname, "", history, SmackConfiguration.getDefaultPacketReplyTimeout());
+                } catch (SmackException.NoResponseException e) {
+                    e.printStackTrace();
+                } catch (XMPPException.XMPPErrorException e) {
+                    e.printStackTrace();
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                }
+
+
+                Log.d("Sending fn", "Joined");
+                Log.d("history", String.valueOf(history));
+
+                try {
+                    muc.sendMessage(PicMessagetoSend);
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                }
+
+
+
+                //add the video to a screen
+                TextView tv=new TextView(context);
+                tv.setLayoutParams(layoutparams);
+                tv.setText("me:\n");
+
+                CardView cvi = new CardView(context);
+
+                layoutparams.setMargins(15,15,15,15);
+                cvi.setLayoutParams(layoutparams);
+                cvi.setRadius(5);
+                cvi.setPadding(15, 5, 15, 5);
+                cvi.setCardBackgroundColor(0xFFFFFFCC);
+                cvi.setMaxCardElevation(10);
+                cvi.addView(tv);
+
+
+
+
+
+                //add the video
+                VideoView videoview = new VideoView(context);
+                videoview.setLayoutParams(layoutParamsvideo);
+                videoview.setVideoURI(Uri.parse(mCurrentVideoPath)); //the string of the URL mentioned above
+                videoview.requestFocus();
+
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        videoview.start();
+                    }
+                });
+
+
+
+                CardView cvt = new CardView(context);
+                layoutparams.setMargins(15,15,15,15);
+                cvt.setLayoutParams(layoutParamsimg);
+                cvt.setRadius(5);
+                cvt.setPadding(15, 5, 15, 5);
+                cvt.setCardBackgroundColor(0xFFFFFFCC);
+                cvt.setMaxCardElevation(10);
+                cvt.addView(videoview);
+
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        LinearLayoutView.addView(cvi);
+                        LinearLayoutView.addView(cvt);
+
+                    }
+                });
+
+
+            }
+            else
+            {
+
+                runOnUiThread(new Runnable(){
+                    public void run()
+                    {
+                        Toast.makeText(context, "Not Connected.",  Toast.LENGTH_LONG).show();
+                    }
+
+                });
+
+                Intent intent = getIntent();
+                intent.putExtra(EXTRA_PWD, pword);
+                intent.putExtra(EXTRA_NAME, uname);
+                intent.putExtra(EXTRA_SENDER,sender);
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                finish();
+                overridePendingTransition(0, 0);
+
+                startActivity(intent);
+                overridePendingTransition(0, 0);
+
+            }
+
+            //add the message to db
+            IndividualChat2.MessageHandlerP mppp=new IndividualChat2.MessageHandlerP();
+
+            String content=uploadedPath;
+            String time=Currenttime;
+            String fromwhom=sender;
+            String towhom=uname;
+
+            mppp.pinsertMessage(content,time, fromwhom,"","yes",towhom,"four");
+
+
+
+
+
+
+
+
+
 
         }//end of upload
 
@@ -1671,13 +2274,6 @@ public class IndividualChat2 extends AppCompatActivity {
         
         return ti;
     }//end of function
-
-
-
-
-
-
-
 
 
 }//end of outer class
