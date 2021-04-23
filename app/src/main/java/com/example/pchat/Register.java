@@ -16,6 +16,7 @@ import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.iqregister.AccountManager;
@@ -141,17 +142,12 @@ public class Register extends AppCompatActivity {
                 connection.connect().login();
             } catch (XMPPException e) {
                 e.printStackTrace();
+
             } catch (SmackException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
-
-
-
-
 
 
 
@@ -174,8 +170,25 @@ public class Register extends AppCompatActivity {
                 }
 
 
+                String jid=uname+"@pchat";
+
+                Roster roster = Roster.getInstanceFor(connection);
+                roster.setSubscriptionMode(Roster.SubscriptionMode.accept_all);
+                try {
+                    roster.createEntry(uname, jid, null);
+                } catch (SmackException.NotLoggedInException e) {
+                    e.printStackTrace();
+                } catch (SmackException.NoResponseException e) {
+                    e.printStackTrace();
+                } catch (XMPPException.XMPPErrorException e) {
+                    e.printStackTrace();
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                }
+
+
                 //at this point disconnect
-                connection.disconnect();
+
                 IsAccountCreated = true;
 
 
@@ -201,7 +214,7 @@ public class Register extends AppCompatActivity {
                     .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled) // Do not disable TLS except for test purposes!
                     .setDebuggerEnabled(true)
                     .setSendPresence(true)
-                    .build();
+                   .build();
 
 
             connection = new XMPPTCPConnection(config);

@@ -85,34 +85,6 @@ public class CreateGroup extends AppCompatActivity {
 
 
 
-        Button individualmessagesend_button= findViewById(R.id.individualmessagesendbutton);
-        individualmessagesend_button.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-
-
-
-                EditText et;
-                et=(EditText)findViewById(R.id.individualmessageto);
-                String toPerson=et.getText().toString();
-
-
-
-                Intent intent = new Intent(context, IndividualChat2.class);
-                intent.putExtra(EXTRA_PWD, pword);
-                intent.putExtra(EXTRA_NAME, uname);
-                intent.putExtra(EXTRA_SENDER, toPerson);
-                startActivity(intent);
-
-
-
-                //new individualmessagesend().execute();
-
-
-            }
-        });
-
-
-
 
 
 

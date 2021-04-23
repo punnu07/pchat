@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -103,6 +104,14 @@ public class MyGroups extends AppCompatActivity {
     CardView []cv;
 
 
+    CardView cvv;
+
+    LinearLayout  LinearLayoutViewHor,LinearLayoutViewHor2;
+
+    LinearLayout.LayoutParams  layoutparamsicon = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT );
+
+    LinearLayout.LayoutParams  layoutparamscard = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT );
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,54 +132,64 @@ public class MyGroups extends AppCompatActivity {
         layoutparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT );
 
 
-
-
-
         Display display = getWindowManager().getDefaultDisplay();
         int screenWidth = display.getWidth();
         int screenHeight = display.getHeight();
 
 
+
         //sv=new ScrollView(context);
         LinearLayoutView = new LinearLayout(this);
         LinearLayoutView.setOrientation(LinearLayout.VERTICAL);
-
         GroupInfoDatabaseAdapter gdba = new GroupInfoDatabaseAdapter(context);
 
         ArrayList<String> GroupList=gdba.getAllGroups();
-
-
-
         cv=new CardView[GroupList.size()];
 
-         sv=new ScrollView(context);
+
+        sv=new ScrollView(context);
 
         for (int i=0; i<GroupList.size();i++){
 
-            cv[i] = new CardView(context);
 
+            LinearLayoutViewHor = new LinearLayout(this);
+            LinearLayoutViewHor.setOrientation(LinearLayout.HORIZONTAL);
+            LinearLayoutViewHor.setLayoutParams(layoutparamscard);
+
+
+
+            cvv = new CardView(context);
             layoutparams.setMargins(5,5,5,5);
-            cv[i].setLayoutParams(layoutparams);
-            cv[i].setRadius(5);
-            cv[i].setPadding(5, 5, 5, 5);
-            cv[i].setCardBackgroundColor(0xFDFDFDFF);
-            cv[i].setMaxCardElevation(10);
+            cvv.setLayoutParams(layoutparams);
+            cvv.setRadius(5);
+            cvv.setPadding(5, 5, 5, 5);
+            cvv.setCardBackgroundColor(0xFDFDFDFF);
+            cvv.setMaxCardElevation(10);
 
 
-           String []firstname=GroupList.get(i).split("@");
+            layoutparamsicon.setMargins(40,15,40,0);
+
+            ImageView iv=new ImageView(context);
+            iv.setImageResource(R.drawable.group);
+            iv.setLayoutParams(layoutparamsicon);
+            LinearLayoutViewHor.addView(iv);
 
 
+
+            String []firstname=GroupList.get(i).split("@");
             Button groupbutton=new Button(context);
             groupbutton.setText(firstname[0]);
-
             hash_Set.add(firstname[0]);
             //groupbutton.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+
             groupbutton.setBackgroundColor(Color.WHITE);
             groupbutton.setPadding(25,25,25,25);
-
             groupbutton.setTextColor(0xFF6EA470);
-            cv[i].addView(groupbutton);
 
+            groupbutton.setLayoutParams(layoutparamscard);
+
+            LinearLayoutViewHor.addView(groupbutton);
+            cvv.addView(LinearLayoutViewHor);
 
             int finalI = i;
             groupbutton.setOnClickListener(new View.OnClickListener() {
@@ -191,8 +210,8 @@ public class MyGroups extends AppCompatActivity {
 
             //cv[i].addView(textview);
 
-            cv[i].setClickable(true);
-            LinearLayoutView.addView(cv[i]);
+            cvv.setClickable(true);
+            LinearLayoutView.addView(cvv);
 
         }//end of all the groups
 
@@ -233,6 +252,17 @@ public class MyGroups extends AppCompatActivity {
                 cvv.setMaxCardElevation(10);
 
 
+
+                LinearLayoutViewHor = new LinearLayout(this);
+                LinearLayoutViewHor.setOrientation(LinearLayout.HORIZONTAL);
+                LinearLayoutViewHor.setLayoutParams(layoutparamscard);
+
+                ImageView iv=new ImageView(context);
+                iv.setImageResource(R.drawable.person);
+                iv.setLayoutParams(layoutparamsicon);
+                LinearLayoutViewHor.addView(iv);
+
+
                 Button groupbutton = new Button(context);
 
 
@@ -243,15 +273,15 @@ public class MyGroups extends AppCompatActivity {
                 else {
                     groupbutton.setText(user);
                 }
-                    groupbutton.setBackgroundColor(Color.WHITE);
+                groupbutton.setBackgroundColor(Color.WHITE);
                 groupbutton.setPadding(25, 25, 25, 25);
 
                 groupbutton.setTextColor(0xFF6EA470);
 
+                groupbutton.setLayoutParams(layoutparamscard);
 
-
-                cvv.addView(groupbutton);
-
+                LinearLayoutViewHor.addView(groupbutton);
+                cvv.addView(LinearLayoutViewHor);
 
                 int finalI = i;
                 groupbutton.setOnClickListener(new View.OnClickListener() {
@@ -300,8 +330,7 @@ public class MyGroups extends AppCompatActivity {
 
 
 
-
-                Intent intent = new Intent(context, CreateGroup.class);
+                Intent intent = new Intent(context, menu.class);
                 intent.putExtra(EXTRA_PWD, pword);
                 intent.putExtra(EXTRA_NAME, uname);
                 startActivity(intent);
@@ -538,6 +567,15 @@ public class MyGroups extends AppCompatActivity {
 
                                                     }//end of type =3
 
+                                                    if(type.equals("four"))
+                                                    {
+                                                        String content = doc.getElementsByTagName("content").item(0).getTextContent();
+                                                        String time =  doc.getElementsByTagName("time").item(0).getTextContent();
+                                                        String sender =  doc.getElementsByTagName("sender").item(0).getTextContent();
+                                                        MessageHandlerG mggg=new MessageHandlerG();
+                                                        mggg.ginsertMessage(content,time, sender,"null","yes",uname,"four");
+
+                                                    }//end of type =4
 
 
 
@@ -546,73 +584,6 @@ public class MyGroups extends AppCompatActivity {
                                                 else
                                                 {
 
-                                                    /*
-                                                   MessageHandlerG mg=new MessageHandlerG();
-                                                   mg.ginsertMessage(message.getBody(),"null", message.getFrom().toString(),"null","yes");
-                                                    String []messageFrom=message.getFrom().split("@");
-
-
-                                                    if(!hash_Set.contains(messageFrom[0]))                                                    //groupbutton.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
-                                                    {
-
-                                                        hash_Set.add(messageFrom[0]);
-
-                                                        CardView cvv = new CardView(context);
-
-                                                        layoutparams.setMargins(5, 5, 5, 5);
-                                                        cvv.setLayoutParams(layoutparams);
-                                                        cvv.setRadius(5);
-                                                        cvv.setPadding(5, 5, 5, 5);
-                                                        cvv.setCardBackgroundColor(0xFDFDFDFF);
-                                                        cvv.setMaxCardElevation(10);
-
-
-                                                        Button groupbutton = new Button(context);
-
-
-                                                        groupbutton.setText(messageFrom[0]);
-
-                                                        groupbutton.setBackgroundColor(Color.WHITE);
-                                                        groupbutton.setPadding(25, 25, 25, 25);
-
-                                                        groupbutton.setTextColor(0xFF6EA470);
-                                                        cvv.addView(groupbutton);
-
-
-                                                        groupbutton.setOnClickListener(new View.OnClickListener() {
-                                                            public void onClick(View v) {
-
-                                                                //Intent intent = new Intent(context, IndividualChat.class);
-
-                                                                Intent intent = new Intent(context, IndividualChat2.class);
-                                                                intent.putExtra(EXTRA_PWD, pword);
-                                                                intent.putExtra(EXTRA_NAME, uname);
-                                                                intent.putExtra(EXTRA_SENDER, messageFrom[0]);
-                                                                startActivity(intent);
-
-
-                                                            }
-                                                        });
-
-                                                        //cv[i].addView(textview);
-
-                                                        cvv.setClickable(true);
-
-
-                                                        runOnUiThread(new Runnable() {
-                                                            public void run() {
-
-                                                                LinearLayoutView.addView(cvv);
-                                                                //sv.addView();
-                                                            }
-                                                        });
-
-
-                                                    }//add to user list
-
-
-
-                                                    */
 
                                                 }//end of individual message
 
@@ -622,9 +593,6 @@ public class MyGroups extends AppCompatActivity {
                                 Log.w("app", chat.toString());
                             }// end of chat created
                         });
-
-
-
 
                 //get the roster list
                 Roster roster = Roster.getInstanceFor(connection);
@@ -645,15 +613,11 @@ public class MyGroups extends AppCompatActivity {
                 ig.truncate();
 
                 for (RosterEntry entry : entries) {
-
-                    //String toPerson = entry.getName();
+                   //String toPerson = entry.getName();
                     String groupname= entry.getName();
                     ig.insertGroup(groupname);
 
                 }//end of roster entries
-
-
-
 
            }//end of connection
 
@@ -705,12 +669,9 @@ public class MyGroups extends AppCompatActivity {
 
 
 
-
-        //class for db for message storing
-
-
-        private class MessageHandlerG
-        {
+       //class for db for message storing
+       private class MessageHandlerG
+       {
             MessageStoreDatabaseAdapter gdba1,gdba2,gdba3;
 
             MessageHandlerG()
@@ -785,36 +746,11 @@ public class MyGroups extends AppCompatActivity {
 
 
 
-
-
-
-
-
-
-
-        }//end of class
-
-
-
-
-
-
-
+       }//end of class
 
 
 
     }//end of inner class
-
-
-
-
-
-
-
-
-
-
-
 
 
 }//end of outer class

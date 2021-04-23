@@ -1,4 +1,4 @@
-   package com.example.pchat;
+  package com.example.pchat;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -342,8 +342,8 @@ public class MyChatroom extends AppCompatActivity {
             }
         });
 
-
          */
+
 
 
         ImageButton picuploadbutton=findViewById(343434);
@@ -378,6 +378,9 @@ public class MyChatroom extends AppCompatActivity {
 
             }
         });
+
+
+
 
 
 
