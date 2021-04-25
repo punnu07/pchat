@@ -199,6 +199,7 @@ public class IndividualChat2 extends AppCompatActivity {
         ArrayList <String> Individualmessage=mp.pgetAllIndividual_Message();
         ArrayList <String> timeList=mp.pgetAllTime();
         ArrayList <String> typeList=mp.pgetAllType();
+        ArrayList <String> recList=mp.pgetAllRecepient();
 
 
 
@@ -338,18 +339,20 @@ public class IndividualChat2 extends AppCompatActivity {
         LinearLayoutViewBig.setOrientation(LinearLayout.HORIZONTAL);
 
         int num_messages_to_display=0;
-        String sendername;
+        String sendername, recname;
 
         //get the num of cards to display
         for(int i=0;i<messageList.size();i++)
         {
             sendername=senderList.get(i);
-            if(sendername.equals(sender) && Individualmessage.get(i).equals("yes"))
+            recname=recList.get(i);
+
+            if(sendername.equals(sender) && recname.equals(uname) && Individualmessage.get(i).equals("yes"))
             {
                 num_messages_to_display++;
                 //messagetoDisplay=messagetoDisplay+"\n\n"+sender+":"+messageList.get(i);
             }
-            if(sendername.equals(uname) && Individualmessage.get(i).equals("yes"))
+            if(sendername.equals(uname) && recname.equals(sender) && Individualmessage.get(i).equals("yes"))
             {
                 num_messages_to_display++;
                 //messagetoDisplay=messagetoDisplay+"\n\n"+sender+":"+messageList.get(i);
@@ -360,8 +363,6 @@ public class IndividualChat2 extends AppCompatActivity {
 
         cv=new CardView[num_messages_to_display];
         int j=0;
-
-
 
         //diplay the messages
 
@@ -374,9 +375,8 @@ public class IndividualChat2 extends AppCompatActivity {
         {
           int i=ti.get(k).index;
 
-         if((senderList.get(i).equals(sender)||senderList.get(i).equals(uname)) && Individualmessage.get(i).equals("yes"))
+         if(((senderList.get(i).equals(sender) && recList.get(i).equals(uname)) ||(senderList.get(i).equals(uname) && recList.get(i).equals(sender))) && Individualmessage.get(i).equals("yes"))
          {
-
 
                     String type=typeList.get(i);
 

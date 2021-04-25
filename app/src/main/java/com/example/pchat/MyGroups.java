@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -73,16 +74,13 @@ public class MyGroups extends AppCompatActivity {
     Set<String> hash_Set = new HashSet<String>();
 
 
-
     public static final String EXTRA_NAME = "a";
     public static final String EXTRA_PWD = "b";
     public static final String EXTRA_SENDER = "c";
 
     public static final String EXTRA_ROOM = "c";
 
-
     final Context context = this;
-
 
     public String uname = "";
     public String pword = "";
@@ -102,7 +100,6 @@ public class MyGroups extends AppCompatActivity {
 
     ScrollView sv;
     CardView []cv;
-
 
     CardView cvv;
 
@@ -137,6 +134,9 @@ public class MyGroups extends AppCompatActivity {
         int screenHeight = display.getHeight();
 
 
+        layoutparamsicon.setMargins(40,15,40,0);
+        layoutparams.setMargins(5,5,5,5);
+
 
         //sv=new ScrollView(context);
         LinearLayoutView = new LinearLayout(this);
@@ -157,23 +157,17 @@ public class MyGroups extends AppCompatActivity {
             LinearLayoutViewHor.setLayoutParams(layoutparamscard);
 
 
-
             cvv = new CardView(context);
-            layoutparams.setMargins(5,5,5,5);
             cvv.setLayoutParams(layoutparams);
             cvv.setRadius(5);
             cvv.setPadding(5, 5, 5, 5);
             cvv.setCardBackgroundColor(0xFDFDFDFF);
             cvv.setMaxCardElevation(10);
 
-
-            layoutparamsicon.setMargins(40,15,40,0);
-
             ImageView iv=new ImageView(context);
             iv.setImageResource(R.drawable.group);
             iv.setLayoutParams(layoutparamsicon);
             LinearLayoutViewHor.addView(iv);
-
 
 
             String []firstname=GroupList.get(i).split("@");
@@ -251,8 +245,6 @@ public class MyGroups extends AppCompatActivity {
                 cvv.setCardBackgroundColor(0xFDFDFDFF);
                 cvv.setMaxCardElevation(10);
 
-
-
                 LinearLayoutViewHor = new LinearLayout(this);
                 LinearLayoutViewHor.setOrientation(LinearLayout.HORIZONTAL);
                 LinearLayoutViewHor.setLayoutParams(layoutparamscard);
@@ -262,9 +254,7 @@ public class MyGroups extends AppCompatActivity {
                 iv.setLayoutParams(layoutparamsicon);
                 LinearLayoutViewHor.addView(iv);
 
-
                 Button groupbutton = new Button(context);
-
 
                 if(user.equals(uname))
                 {
@@ -273,11 +263,10 @@ public class MyGroups extends AppCompatActivity {
                 else {
                     groupbutton.setText(user);
                 }
+
                 groupbutton.setBackgroundColor(Color.WHITE);
                 groupbutton.setPadding(25, 25, 25, 25);
-
                 groupbutton.setTextColor(0xFF6EA470);
-
                 groupbutton.setLayoutParams(layoutparamscard);
 
                 LinearLayoutViewHor.addView(groupbutton);
@@ -318,6 +307,8 @@ public class MyGroups extends AppCompatActivity {
 
 
 
+        FrameLayout fl=new FrameLayout(context);
+
 
 
 
@@ -356,19 +347,18 @@ public class MyGroups extends AppCompatActivity {
 
         lay.setMargins(8*screenWidth/10,10,2,2);
         fab.setLayoutParams(lay);
-
         fab.setImageBitmap(textAsBitmap("+", 44, Color.WHITE));
 
 
+        fl.setPadding(8*screenWidth/10, 8*screenHeight/10,0,0);
+       // fl.addView(fab);
 
         LinearLayoutView.addView(fab);
 
 
 
 
-
         sv.addView(LinearLayoutView);
-
         setContentView(sv);
 
 

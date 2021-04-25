@@ -80,7 +80,6 @@ public class Register extends AppCompatActivity {
 
 
 
-
     //starting of inner class
     private class createnewuser extends AsyncTask<Void, Void, Void> {
         String result;

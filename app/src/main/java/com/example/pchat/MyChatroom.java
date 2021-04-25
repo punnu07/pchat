@@ -9,6 +9,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -30,6 +31,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -321,12 +323,26 @@ public class MyChatroom extends AppCompatActivity {
         });
 
 
+        FrameLayout fl=new FrameLayout(context);
+
+        FrameLayout.LayoutParams flp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CLIP_VERTICAL);
+        flp.setMargins(0,0,100,100);
+        flp.gravity = (Gravity.TOP |Gravity.RIGHT);
+
+        //fl.setForegroundGravity(Gravity.CLIP_VERTICAL);
+        //fl.setLayoutParams(flp);
+        FloatingActionButton fb=new FloatingActionButton(context);
 
 
-        /*
-        FloatingActionButton fb;
-        fb=findViewById(R.id.floatingActionButonAddUser);
         fb.setImageBitmap(textAsBitmap("+", 44, Color.WHITE));
+        //fb.setLayoutParams(flp);
+        fb.setForegroundGravity(Gravity.RIGHT);
+
+
+        fb.setBackgroundColor(0xFFE27070);
+        fb.setBackgroundTintList(ColorStateList.valueOf(0xFFE27070));
+
 
         fb.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -342,8 +358,14 @@ public class MyChatroom extends AppCompatActivity {
             }
         });
 
-         */
 
+
+        fl.addView(fb);
+        fl.setForegroundGravity(5);
+
+        fl.setPadding(8*screenWidth/10,0*screenHeight/10,0,0);
+
+        rlayoutView.addView(fl);
 
 
         ImageButton picuploadbutton=findViewById(343434);
