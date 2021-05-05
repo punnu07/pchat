@@ -421,7 +421,7 @@ public class MyGroups extends AppCompatActivity {
 
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog.setMessage("Loading Groups ");
+            dialog.setMessage(" ");
             dialog.show();
         }
 

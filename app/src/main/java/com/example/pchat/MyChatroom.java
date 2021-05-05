@@ -155,8 +155,8 @@ public class MyChatroom extends AppCompatActivity {
 
         layoutparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT );
         layoutparams2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT );
-        layoutParamsimg=new LinearLayout.LayoutParams(screenWidth/2, screenWidth/2 );
-        layoutParamsvideo=new LinearLayout.LayoutParams(8*screenWidth/10, 8*screenWidth/10 );
+        layoutParamsimg=new LinearLayout.LayoutParams(8*screenWidth/10, screenHeight );
+        layoutParamsvideo=new LinearLayout.LayoutParams(8*screenWidth/10, screenHeight );
 
 
 
@@ -600,7 +600,7 @@ public class MyChatroom extends AppCompatActivity {
 
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog.setMessage("Connecting");
+            dialog.setMessage(" ");
             dialog.show();
         }
 
@@ -1019,6 +1019,12 @@ public class MyChatroom extends AppCompatActivity {
                                  VideoView videoview=new VideoView(context);
                                  videoview.setLayoutParams(layoutParamsvideo);
                                  videoview.setVideoURI(Uri.parse(content)); //the string of the URL mentioned above
+
+                                 MediaController mediaController = new MediaController(context);
+                                 //mediaController.setAnchorView(videoview);
+                                 videoview.setMediaController(mediaController);
+
+
                                  videoview.requestFocus();
 
                                  runOnUiThread(new Runnable() {
@@ -1051,6 +1057,11 @@ public class MyChatroom extends AppCompatActivity {
                                  VideoView videoview=new VideoView(context);
                                  videoview.setLayoutParams(layoutParamsvideo);
                                  videoview.setVideoURI(Uri.parse(destinationfilename)); //the string of the URL mentioned above
+
+                                 MediaController mediaController = new MediaController(context);
+                                 //mediaController.setAnchorView(videoview);
+                                 videoview.setMediaController(mediaController);
+
                                  videoview.requestFocus();
 
                                  runOnUiThread(new Runnable() {
@@ -1108,7 +1119,7 @@ public class MyChatroom extends AppCompatActivity {
 
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog.setMessage("Sending");
+            dialog.setMessage(" ");
             dialog.show();
         }
 
@@ -1241,7 +1252,7 @@ public class MyChatroom extends AppCompatActivity {
 
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog.setMessage("Uploading...");
+            dialog.setMessage(" ");
             dialog.show();
         }
 
@@ -1436,7 +1447,7 @@ public class MyChatroom extends AppCompatActivity {
 
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog.setMessage("Uploading...");
+            dialog.setMessage(" ");
             dialog.show();
         }
 

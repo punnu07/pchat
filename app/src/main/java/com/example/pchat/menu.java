@@ -207,7 +207,7 @@ public class menu extends AppCompatActivity {
 
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog.setMessage("Fetching");
+            dialog.setMessage(" ");
             dialog.show();
         }
 

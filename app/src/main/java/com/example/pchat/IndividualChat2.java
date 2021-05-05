@@ -41,6 +41,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -187,8 +188,8 @@ public class IndividualChat2 extends AppCompatActivity {
 
         layoutparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT );
         layoutparams2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT );
-        layoutParamsimg=new LinearLayout.LayoutParams(screenWidth/2, screenWidth/2 );
-        layoutParamsvideo=new LinearLayout.LayoutParams(8*screenWidth/10, 8*screenWidth/10 );
+        layoutParamsimg=new LinearLayout.LayoutParams(8*screenWidth/10, screenHeight );
+        layoutParamsvideo=new LinearLayout.LayoutParams(8*screenWidth/10, screenHeight );
 
 
 
@@ -668,6 +669,11 @@ public class IndividualChat2 extends AppCompatActivity {
                      VideoView videoview = new VideoView(context);
                      videoview.setLayoutParams(layoutParamsvideo);
                      videoview.setVideoURI(Uri.parse(content)); //the string of the URL mentioned above
+
+                     MediaController mediaController = new MediaController(context);
+                     //mediaController.setAnchorView(videoview);
+                     videoview.setMediaController(mediaController);
+
                      videoview.requestFocus();
 
                      runOnUiThread(new Runnable() {
@@ -698,6 +704,11 @@ public class IndividualChat2 extends AppCompatActivity {
                      VideoView videoview = new VideoView(context);
                      videoview.setLayoutParams(layoutParamsvideo);
                      videoview.setVideoURI(Uri.parse(destinationfilename)); //the string of the URL mentioned above
+
+                     MediaController mediaController = new MediaController(context);
+                    // mediaController.setAnchorView(videoview);
+                     videoview.setMediaController(mediaController);
+
                      videoview.requestFocus();
 
                      runOnUiThread(new Runnable() {
@@ -858,9 +869,6 @@ public class IndividualChat2 extends AppCompatActivity {
 
         rlayoutparams4.addRule(RelativeLayout.LEFT_OF,606060);
         rlayoutparams7.addRule(RelativeLayout.RIGHT_OF,606060);
-
-
-
 
 
 
@@ -1076,7 +1084,7 @@ public class IndividualChat2 extends AppCompatActivity {
 
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog.setMessage("Fetching...");
+            dialog.setMessage(" ");
             dialog.show();
         }
 
@@ -1466,6 +1474,13 @@ public class IndividualChat2 extends AppCompatActivity {
                                                     VideoView videoview = new VideoView(context);
                                                     videoview.setLayoutParams(layoutParamsvideo);
                                                     videoview.setVideoURI(Uri.parse(content)); //the string of the URL mentioned above
+
+
+                                                    MediaController mediaController = new MediaController(context);
+                                                    mediaController.setAnchorView(videoview);
+                                                    videoview.setMediaController(mediaController);
+
+
                                                     videoview.requestFocus();
 
                                                     runOnUiThread(new Runnable() {
@@ -1491,12 +1506,23 @@ public class IndividualChat2 extends AppCompatActivity {
                                                         }
                                                     });
 
+                                                    Log.d("Video File Present","false");
+
+
+
                                                 } else {
 
+                                                    Log.d("Video File Present","true");
                                                     VideoView videoview = new VideoView(context);
                                                     videoview.setLayoutParams(layoutParamsvideo);
                                                     videoview.setVideoURI(Uri.parse(destinationfilename)); //the string of the URL mentioned above
+
+                                                    MediaController mediaController = new MediaController(context);
+                                                    mediaController.setAnchorView(videoview);
+                                                    videoview.setMediaController(mediaController);
+
                                                     videoview.requestFocus();
+
 
                                                     runOnUiThread(new Runnable() {
                                                         public void run() {
@@ -1571,7 +1597,7 @@ public class IndividualChat2 extends AppCompatActivity {
 
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog.setMessage("Sending...");
+            dialog.setMessage(" ");
             dialog.show();
         }
 
@@ -1696,7 +1722,7 @@ public class IndividualChat2 extends AppCompatActivity {
 
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog.setMessage("Uploading...");
+            dialog.setMessage(" ");
             dialog.show();
         }
 
@@ -1879,7 +1905,7 @@ public class IndividualChat2 extends AppCompatActivity {
 
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog.setMessage("Uploading...");
+            dialog.setMessage(" ");
             dialog.show();
         }
 
