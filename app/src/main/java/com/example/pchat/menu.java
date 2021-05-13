@@ -110,7 +110,7 @@ public class menu extends AppCompatActivity {
 
 
 
-
+        /*
 
         //for a horizontal row
         LinearLayoutViewHor = new LinearLayout(this);
@@ -140,6 +140,10 @@ public class menu extends AppCompatActivity {
         LinearLayoutViewHor.addView(tv);
         cvv.addView(LinearLayoutViewHor);
         LinearLayoutView.addView(cvv);
+
+
+        */
+
 
         //add group
         LinearLayoutViewHor = new LinearLayout(this);
